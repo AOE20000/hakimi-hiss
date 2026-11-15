@@ -1,0 +1,11 @@
+# Hakimi Hiss Duel runtime artifacts & locks
+data/arena_state.json
+data/arena_state.*.tmp
+data/arena_state.lock/
+data/arena_state.lock.*/
+data/worktrees/
+
+# Python bytecode & caches
+**/__pycache__/
+*.py[cod]
+*$py.class

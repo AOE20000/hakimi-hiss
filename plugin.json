@@ -1,0 +1,13 @@
+{
+  "name": "hakimi-hiss",
+  "displayName": "哈基米哈气审查 (Hakimi Hiss Duel)",
+  "version": "1.0.0",
+  "description": "依旧两哈基米相互哈气就算审查了！使用当前模型创建子代理A与B，通过专属防重通道比拼找Bug（一胜）与交叉修Bug（二胜），支持「啥子」标记、长期上下文保持与手动重置。",
+  "logo": "assets/logo.png",
+  "author": "Antigravity",
+  "suggestedPrompts": [
+    "召唤两只哈基米对当前项目开启哈气找Bug大赛（决出一胜）",
+    "让哈基米A和B交叉修复对方找到的Bug（决出二胜，修坏的贴上啥子标记）",
+    "查看哈基米哈气通道战况与啥子榜，或手动重置子代理上下文"
+  ]
+}

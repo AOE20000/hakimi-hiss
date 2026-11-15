@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "hakimi-hiss-channel": {
+      "command": "cmd",
+      "args": [
+        "/d",
+        "/q",
+        "/c",
+        "cmd /d /q /v:on /c ^(set _D=^)^& ^(if defined PLUGIN_ROOT ^(set _P=!PLUGIN_ROOT:/=\\!^& pushd !_P! 2^>nul ^&^& ^(^(if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=!CD!^)^)^& popd^)^)^)^& ^(if not defined _D if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=.^)^)^& ^(if not defined _D if defined ANTIGRAVITY_GEMINI_DIR ^(set _G=!ANTIGRAVITY_GEMINI_DIR:/=\\!^& set _R=config^& ^(if defined ANTIGRAVITY_CONFIG_REL_DIR ^(set _R=!ANTIGRAVITY_CONFIG_REL_DIR:/=\\!^)^)^& pushd !_G!\\!_R!\\plugins\\hakimi-hiss 2^>nul ^&^& ^(^(if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=!CD!^)^)^& popd^)^)^)^& ^(if not defined _D if defined USERPROFILE ^(set _U=!USERPROFILE:/=\\!^& ^(if defined ANTIGRAVITY_CONFIG_REL_DIR ^(set _R=!ANTIGRAVITY_CONFIG_REL_DIR:/=\\!^& pushd !_U!\\.gemini\\!_R!\\plugins\\hakimi-hiss 2^>nul ^&^& ^(^(if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=!CD!^)^)^& popd^)^)^)^& ^(if not defined _D ^(pushd !_U!\\.gemini\\config\\plugins\\hakimi-hiss 2^>nul ^&^& ^(^(if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=!CD!^)^)^& popd^)^)^)^& ^(if not defined _D ^(pushd !_U!\\.agents\\plugins\\hakimi-hiss 2^>nul ^&^& ^(^(if exist skills\\hakimi-hiss\\scripts\\launch_mcp.cmd ^(set _D=!CD!^)^)^& popd^)^)^)^)^)^& ^(if defined _D ^(cd /d !_D! ^&^& call skills\\hakimi-hiss\\scripts\\launch_mcp.cmd^) else ^(echo [hakimi-hiss] launch_mcp.cmd not found^>^&2 ^& exit /b 1^)^)"
+      ]
+    }
+  }
+}
