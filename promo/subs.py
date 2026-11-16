@@ -49,8 +49,8 @@ def mux(silent_mp4, wav, ass_path, out_mp4):
     vf = f"ass={ass_path}:fontsdir={fontsdir}"
     subprocess.run(
         ["ffmpeg", "-y", "-loglevel", "error", "-i", str(silent_mp4), "-i", str(wav),
-         "-vf", vf, "-c:v", "libx264", "-preset", "medium", "-crf", "17", "-pix_fmt", "yuv420p",
-         "-c:a", "aac", "-b:a", "192k", "-shortest", "-movflags", "+faststart", str(out_mp4)],
+         "-vf", vf, "-c:v", "libx264", "-preset", "slow", "-crf", "24", "-maxrate", "2M", "-bufsize", "4M",
+         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", str(out_mp4)],
         check=True,
     )
     print(out_mp4)
