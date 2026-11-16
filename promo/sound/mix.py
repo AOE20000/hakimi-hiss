@@ -160,8 +160,8 @@ def build_mix(out_wav, end_t=None):
         # ── 03-round2 (S08 - S10) ──
         place(sfx, S["S08"]["start"] - 0.05, sfx_sys_chime(880, 1318), 0)   # S08 双 Worktree 交叉修复弹窗
         place(sfx, S["S08"]["start"] + 0.50, sfx_pop(640, 1120), -2)        # Bug 胶囊交叉飞向对方沙盒
-        place(sfx, S["S09"]["start"] - 0.15, sfx_sys_chime(1046, 784), 0)   # S09 REJECT_WITH_HISS 弹窗
-        place(sfx, S["S09"]["start"] + 1.80, sfx_buzzer(), +1)              # A 一爪拍下「驳回重修」印章
+        place(sfx, S["S09"]["start"] - 0.15, sfx_sys_chime(1046, 784), 0)   # S09 Worktree 合入与铲屎官亲测弹窗
+        place(sfx, S["S09"]["start"] + 5.20, sfx_buzzer(), +1)              # 铲屎官复跑并发测试当场抓包死锁印章
         place(sfx, S["S10"]["start"] - 0.20, sfx_fanfare(), -1)             # S10 铲屎官终审金光 PERFECT
         place(sfx, talisman_hit, sfx_gong(), +1.5)                          # S10 搞笑敲锣声 + 【啥子】符纸贴脑门
 

@@ -12,7 +12,7 @@
     background: rgba(14, 16, 32, 0.94); border: 2px solid #a78bfa;
     box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 36px rgba(167,139,250,0.35);
     display: flex; align-items: center; justify-content: space-between; padding: 0 28px; box-sizing: border-box; z-index: 30; }
-  .node-pill { display: flex; align-items: center; gap: 12px; font-family: "Mono"; font-weight: 800; font-size: 16px; }
+  .node-pill { white-space: nowrap; display: flex; align-items: center; gap: 12px; font-family: "Mono"; font-weight: 800; font-size: 16px; }
   .node-pill .dot { width: 14px; height: 14px; border-radius: 50%; }
   .node-pill.a { color: #ffbd9b; }
   .node-pill.a .dot { background: #ff9e6e; box-shadow: 0 0 14px #ff9e6e; }
@@ -22,7 +22,7 @@
   .chain-line { position: absolute; left: 0; right: 0; height: 4px;
     background: repeating-linear-gradient(90deg, #a78bfa 0 18px, #38bdf8 18px 36px);
     box-shadow: 0 0 18px #a78bfa; }
-  .chain-lock { position: relative; padding: 5px 18px; background: #1e1538; border: 2px solid #c4b5fd;
+  .chain-lock { position: relative; padding: 5px 14px; white-space: nowrap; background: #1e1538; border: 2px solid #c4b5fd;
     font-family: "Mono"; font-weight: 800; font-size: 13px; color: #ede9fe; letter-spacing: 2px;
     box-shadow: 0 0 20px rgba(167,139,250,0.65); }
 
@@ -44,9 +44,9 @@
     border: 1.5px solid #6eb8ff; font-family: "Mono"; font-weight: 800; font-size: 19px; color: #bae0ff; letter-spacing: 1px; }
 
   /* B 头顶一闪一闪等待二次唤醒的【啥子】呼吸灯牌 */
-  #shazi-beacon { position: absolute; left: 1480px; top: 300px; padding: 8px 20px;
+  #shazi-beacon { position: absolute; left: 1590px; top: 244px; padding: 7px 16px; white-space: nowrap;
     background: rgba(52, 8, 18, 0.95); border: 2.5px solid #ff3b5c;
-    font-family: "Mono"; font-weight: 800; font-size: 15px; color: #fda4af; letter-spacing: 2px;
+    font-family: "Mono"; font-weight: 800; font-size: 14px; color: #fda4af; letter-spacing: 1.5px;
     box-shadow: 0 0 30px rgba(255, 59, 92, 0.75); z-index: 260; }
 </style>
 <script src="../../shared/kit.js"></script>
@@ -64,12 +64,12 @@
       <div class="node-pill a"><span class="dot"></span><span>橘座 conv_id: 9f3a..c1 [LOCKED]</span></div>
       <div class="chain-mid">
         <div class="chain-line"></div>
-        <div class="chain-lock">⛓ SOUL-CHAIN PERSISTED</div>
+        <div class="chain-lock">⛓ SOUL-CHAIN</div>
       </div>
       <div class="node-pill b"><span>狸花 conv_id: 4b8e..d9 [啥子 QUEUED]</span><span class="dot"></span></div>
     </div>
 
-    <div id="shazi-beacon">⚠ STATUS: 【啥子】 // AWAITING RE-WAKE</div>
+    <div id="shazi-beacon">⚠【啥子】RE-WAKE PENDING</div>
 
     <div id="cta-card">
       <img class="logo" src="../../../assets/logo.png" alt="Hakimi Hiss Logo">
@@ -143,7 +143,7 @@ function build(im) {
   });
 
   G.bA11 = UI.polyBubble(root, {
-    x: 1030, y: 88, w: 580, h: 185, who: "A（橘座）// SOUL-CHAIN LOCKED", theme: "a", tailDir: "bottom-left",
+    x: 1010, y: 88, w: 560, h: 185, who: "A（橘座）// SOUL-CHAIN LOCKED", theme: "a", tailDir: "bottom-left",
     zh: '咱俩的上下文记忆可是锁死的——顶着你的「啥子」称号，<span class="hl-a">乖乖背着黑历史返工吧！</span>',
     en: "OUR CONTEXT MEMORY IS LOCKED TOGETHER—WEAR YOUR 'DUMMY' TAG AND RE-FIX IT!",
   });
@@ -186,7 +186,7 @@ function render(t) {
 
   // B 头顶一闪一闪的【啥子】呼吸灯牌
   const blink = 0.55 + 0.45 * Math.sin(t * 12);
-  UI.put($("shazi-beacon"), { s: ps, o: clamp(ps * 3) * blink });
+  UI.put($("shazi-beacon"), { s: ps, o: clamp(ps * 3) * blink * (1 - tw(t, S.S12.start - 0.1, 0.2)) });
 
   // S11 强存在感系统通知弹窗
   UI.putNotice(G.sysMem, t, E.sysMem);
@@ -207,11 +207,11 @@ function render(t) {
   });
 
   // 黄色【啥子】符纸动画：S11 贴在脑门 → S12 开头被撕起半截拉偏 → E.snapBack 啪地弹回脑门！
-  let talX = 12, talY = -36 - bob, talR = 8, talS = 0.68;
+  let talX = 12, talY = -66 - bob, talR = 8, talS = 0.68;
   if (t >= E.tearTry && t < E.snapBack) {
     const pTear = clamp((t - E.tearTry) / (E.snapBack - E.tearTry));
     talX = 12 + pTear * 85;
-    talY = -36 - pTear * 55;
+    talY = -66 - pTear * 55;
     talR = 8 + pTear * 38;
     talS = 0.68 + pTear * 0.14;
   } else if (t >= E.snapBack) {

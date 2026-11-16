@@ -30,7 +30,9 @@ canvas.abs { transform-origin: 0 0; }
 .poly-bub { position: absolute; z-index: 65; transform-origin: 50% 50%; }
 .poly-bub svg { position: absolute; left: 0; top: 0; overflow: visible; }
 .poly-bub .txt { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center;
-  justify-content: center; text-align: center; padding: 16px 26px; box-sizing: border-box; }
+  justify-content: center; text-align: center; padding: 16px 34px; box-sizing: border-box; }
+.poly-bub .inner { width: 100%; }
+.poly-bub .zh, .poly-bub .en { text-wrap: balance; }
 .poly-bub .who { font-family: "Mono"; font-size: 12px; font-weight: 800; letter-spacing: 2px; margin-bottom: 4px; }
 .poly-bub .zh { font-family: "SansSC"; font-weight: 900; font-size: 27px; line-height: 1.26; color: #f6f8ff; letter-spacing: 0.4px; }
 .poly-bub .en { font-family: "Mono"; font-weight: 700; font-size: 11.5px; letter-spacing: 1.2px; color: rgba(206, 216, 255, 0.62); margin-top: 5px; }
@@ -70,7 +72,7 @@ canvas.abs { transform-origin: 0 0; }
 .sys-notice .scan-flash { position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.55), transparent);
   pointer-events: none; mix-blend-mode: overlay; }
 
-/* 告警拦截红（DUPLICATE / REJECT_WITH_HISS） */
+/* 告警拦截红（DUPLICATE / DEADLOCK CAUGHT） */
 .sys-notice.warn { border-color: #ff3b6b;
   box-shadow: 0 0 0 1px rgba(255,255,255,0.22) inset, 0 28px 80px rgba(0,0,0,0.92),
               0 0 65px rgba(255, 46, 91, 0.62), 0 0 120px rgba(0,0,0,0.95); }

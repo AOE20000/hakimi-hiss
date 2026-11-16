@@ -225,7 +225,8 @@ function drawShield(t) {
     i ? c.lineTo(x, y) : c.moveTo(x, y);
   }
   c.closePath();
-  c.fillStyle = "rgba(255, 38, 84, 0.28)"; c.fill();
+  c.fillStyle = "rgba(58, 6, 22, 0.88)"; c.fill();
+  c.fillStyle = "rgba(255, 38, 84, 0.22)"; c.fill();
   c.lineWidth = 5; c.strokeStyle = "#ff3b6b"; c.stroke();
   c.font = '900 32px "Mono"'; c.fillStyle = "#fff"; c.textAlign = "center";
   c.fillText("DUPLICATE!", 0, 6);
@@ -262,7 +263,7 @@ function render(t) {
       // 扑向通道 → 撞上护盾向右侧弹飞
       const pIn = tw(t, it.t, 0.18, ease.outCubic);
       const bounce = tw(t, E.dupHit, 0.35, ease.outCubic);
-      const fade = tw(t, E.c4 - 0.15, 0.2);
+      const fade = tw(t, E.dupHit + 0.22, 0.22);
       UI.put(card, { x: (1 - pIn) * 300 + bounce * 420, y: bounce * -40, r: bounce * 14, o: clamp(pIn * 3) * (1 - fade) });
     } else {
       const p = tw(t, it.t, 0.25, ease.outBack);

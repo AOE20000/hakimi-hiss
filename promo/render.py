@@ -96,13 +96,13 @@ def main():
             p = OUT / f"{name}.silent.mp4"
             ff = subprocess.Popen(
                 ["ffmpeg", "-y", "-loglevel", "error", "-f", "image2pipe", "-framerate", str(a.fps),
-                 "-c:v", "mjpeg", "-i", "-", "-c:v", "libx264", "-preset", "medium", "-crf", "16",
-                 "-pix_fmt", "yuv420p", "-movflags", "+faststart", str(p)],
+                 "-c:v", "png", "-i", "-", "-c:v", "libx264", "-preset", "veryfast", "-crf", "4",
+                 "-pix_fmt", "yuv444p", "-movflags", "+faststart", str(p)],
                 stdin=subprocess.PIPE,
             )
             st = time.time()
             for i in range(n):
-                ff.stdin.write(grab(page, t0 + i / a.fps))
+                ff.stdin.write(grab(page, t0 + i / a.fps, "png"))
                 if i % 60 == 0:
                     el = time.time() - st
                     print(f"  frame {i}/{n}  {el:.0f}s elapsed", flush=True)

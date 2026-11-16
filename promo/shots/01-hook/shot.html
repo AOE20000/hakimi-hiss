@@ -161,9 +161,10 @@ function drawRadar(t) {
   c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, 215, ang, ang + 0.85); c.closePath(); c.fill();
   // 三个高亮靶点标签：边界越界 / 注入 / 泄漏
   c.font = '800 16px "SansSC"';
-  [[90, 95, "◈ 边界越界 BOUNDARY"], [290, 120, "◈ 注入 SQL/CMD"], [270, 360, "◈ 资源泄漏 LEAK"]].forEach(([x, y, txt]) => {
+  [[40, 95, "◈ 边界越界 BOUNDARY"], [250, 130, "◈ 注入 SQL/CMD"], [230, 360, "◈ 资源泄漏 LEAK"]].forEach(([x, y, txt]) => {
+    const tw_ = c.measureText(txt).width + 16;
     c.fillStyle = "rgba(9, 12, 24, 0.88)"; c.strokeStyle = "#7cc4ff"; c.lineWidth = 1.5;
-    c.fillRect(x - 8, y - 20, 178, 28); c.strokeRect(x - 8, y - 20, 178, 28);
+    c.fillRect(x - 8, y - 20, tw_, 28); c.strokeRect(x - 8, y - 20, tw_, 28);
     c.fillStyle = "#bae6fd"; c.fillText(txt, x, y);
   });
   c.restore();

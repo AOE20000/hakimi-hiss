@@ -68,11 +68,29 @@
     b.appendChild(svg);
 
     const whoColor = theme === "a" ? "#ffb088" : theme === "b" ? "#93ccff" : "#d8b4fe";
-    el("div", "txt", b,
+    const txt = el("div", "txt", b);
+    const inner = el("div", "inner", txt,
       (who ? `<div class="who" style="color:${whoColor}">${who}</div>` : "") +
       `<div class="zh">${zh}</div>` +
       (en ? `<div class="en">${en}</div>` : "")
     );
+    // 自动缩字：保证文字完整落在折角气泡内部（四周保留安全边距）
+    const zhEl = inner.querySelector(".zh"), enEl = inner.querySelector(".en");
+    let fs = 27, efs = 11.5;
+    const maxH = h - 30;
+    const brN = (zh.match(/<br\s*\/?>/gi) || []).length;
+    const zhLines = () => Math.round(zhEl.offsetHeight / (fs * 1.26));
+    // 有显式换行的台词：缩字直到不再出现额外的自动折行（杜绝「了！」孤字行）
+    while (brN > 0 && zhLines() > brN + 1 && fs > 20) {
+      fs -= 1; efs = Math.max(9.5, efs - 0.2);
+      zhEl.style.fontSize = fs + "px";
+      if (enEl) enEl.style.fontSize = efs + "px";
+    }
+    while (inner.offsetHeight > maxH && fs > 18) {
+      fs -= 1; efs = Math.max(9.5, efs - 0.25);
+      zhEl.style.fontSize = fs + "px";
+      if (enEl) enEl.style.fontSize = efs + "px";
+    }
     b.style.transformOrigin = `${origin[0]}px ${origin[1]}px`;
     return b;
   }
