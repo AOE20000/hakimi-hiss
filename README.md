@@ -22,7 +22,7 @@
      - **哈基米A** 负责修复 **B 找到的 Bug**；
      - **哈基米B** 负责修复 **A 找到的 Bug**。
    - **真并行 vs 波次乒乓**：Git Worktree 模式下双方各自在隔离分支目录并发修完后，由 `hakimi_integrate_worktrees` 原子合并回主仓库；降级模式下拆分为无冲突并行波次 + 先手均衡交替乒乓波次，配合 `hakimi_claim_files` 文件软锁与自动解锁防踩踏。
-   - **互哈互验 & 终验裁决**：修复汇报可附带实测验证命令（`verify_cmd`/`verify_passed`），并可发起原发现者 **互哈互验**（`hakimi_report_verify`，支持 `REJECT_WITH_HISS` 打回重修），最终由铲屎官亲自核查并裁决评分（`PERFECT` / `PASS` / `FAILED`），修得更完美者夺得 **二胜**。
+   - **自测汇报 & 终验裁决**：修复汇报可附带实测验证命令（`verify_cmd`/`verify_passed`），如有启用 worktree 则调用 `hakimi_integrate_worktrees` 合回主仓库，最终由铲屎官亲自核查代码、复跑测试并裁决评分（`PERFECT` / `PASS` / `FAILED`），修得更完美者夺得 **二胜**。
 
 4. **「啥子」标记与复审/重修**
    - 任何修复失败（`FAILED`）或被铲屎官判定翻车的修复，都会被贴上 **`【啥子】`** 标记。
