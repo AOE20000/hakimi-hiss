@@ -1,0 +1,134 @@
+{
+ "fps": 30,
+ "total": 58.611,
+ "segs": [
+  {
+   "id": "S01",
+   "who": "nar",
+   "zh": "Gemini 过度自信怎么办？",
+   "en": "What do you do when Gemini gets overconfident?",
+   "start": 0.6,
+   "end": 2.295
+  },
+  {
+   "id": "S02",
+   "who": "gem",
+   "zh": "我的观察力太敏锐了！直接把病根切出来了！",
+   "en": "My eye is razor-sharp! I cut the root cause right out!",
+   "start": 2.645,
+   "end": 5.595
+  },
+  {
+   "id": "S03",
+   "who": "nar",
+   "zh": "简单。再召唤一只 Gemini，让它俩互相哈气。",
+   "en": "Easy. Summon a second Gemini and let them hiss at each other.",
+   "start": 6.045,
+   "end": 9.552
+  },
+  {
+   "id": "S04",
+   "who": "duo",
+   "zh": "哈——！！",
+   "en": "HISSSS!!",
+   "start": 9.802,
+   "end": 10.262
+  },
+  {
+   "id": "S05",
+   "who": "nar",
+   "zh": "这就是，哈基米哈气审查。",
+   "en": "This is Hakimi Hiss Duel.",
+   "start": 10.812,
+   "end": 12.881
+  },
+  {
+   "id": "S06",
+   "who": "nar",
+   "zh": "第一局，哈气找 Bug。两只哈基米同时潜入代码库，每抓到一只虫子，就在通道里登记。",
+   "en": "Round one: the bug hunt. Both dive into the codebase and register every bug they catch.",
+   "start": 13.681,
+   "end": 20.455
+  },
+  {
+   "id": "S07",
+   "who": "gem",
+   "zh": "抓到了！空指针，第四十二行！",
+   "en": "Got one! Null pointer, line forty-two!",
+   "start": 20.755,
+   "end": 22.876
+  },
+  {
+   "id": "S08",
+   "who": "gem",
+   "zh": "哈——！慢了一爪！这只虫子已经被我叼走了！",
+   "en": "Hiss! Too slow by a paw! I already snatched that one!",
+   "start": 23.176,
+   "end": 26.04
+  },
+  {
+   "id": "S09",
+   "who": "nar",
+   "zh": "重复登记，当场拦截。抓得多的，拿下一胜。",
+   "en": "Duplicates are blocked on the spot. Most bugs takes round one.",
+   "start": 26.34,
+   "end": 29.705
+  },
+  {
+   "id": "S10",
+   "who": "nar",
+   "zh": "第二局，交叉修复。你修我的 Bug，我修你的 Bug，各自在独立的工作树里并行开工。",
+   "en": "Round two: cross-fixing. Each fixes the other's bugs, in parallel, in isolated worktrees.",
+   "start": 30.405,
+   "end": 36.5
+  },
+  {
+   "id": "S11",
+   "who": "gem",
+   "zh": "这也叫修好了？打回重修！",
+   "en": "You call that fixed? Rejected. Do it again!",
+   "start": 36.8,
+   "end": 38.74
+  },
+  {
+   "id": "S12",
+   "who": "nar",
+   "zh": "互哈互验之后，由铲屎官亲自裁决。修得更完美的，拿下二胜。",
+   "en": "After mutual hiss-checks, the human makes the final call. The cleaner fix takes round two.",
+   "start": 39.04,
+   "end": 43.956
+  },
+  {
+   "id": "S13",
+   "who": "nar",
+   "zh": "修坏了的？贴上「啥子」。",
+   "en": "Botched it? Branded \"Dummy\".",
+   "start": 44.356,
+   "end": 46.224
+  },
+  {
+   "id": "S14",
+   "who": "nar",
+   "zh": "上下文长期保持，随时复审、重修。",
+   "en": "Context persists, so re-reviews and re-fixes are always on call.",
+   "start": 46.824,
+   "end": 49.836
+  },
+  {
+   "id": "S15",
+   "who": "gem",
+   "zh": "依旧两哈基米相互哈气，就算审查了！",
+   "en": "Two Geminis hissing at each other: that counts as code review!",
+   "start": 50.236,
+   "end": 53.017
+  },
+  {
+   "id": "S16",
+   "who": "nar",
+   "zh": "哈基米哈气审查，Antigravity 插件。",
+   "en": "Hakimi Hiss Duel. A plugin for Antigravity.",
+   "start": 53.517,
+   "end": 56.111
+  }
+ ]
+}

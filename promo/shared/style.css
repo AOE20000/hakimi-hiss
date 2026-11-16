@@ -1,0 +1,38 @@
+@font-face { font-family: "KuaiLe"; src: url("../assets/fonts/ZCOOLKuaiLe-Regular.ttf"); }
+@font-face { font-family: "HuangYou"; src: url("../assets/fonts/ZCOOLQingKeHuangYou-Regular.ttf"); }
+@font-face { font-family: "Bangers"; src: url("../assets/fonts/Bangers-Regular.ttf"); }
+@font-face { font-family: "NotoSC"; src: url("../assets/fonts/NotoSansSC[wght].ttf"); font-weight: 100 900; }
+
+html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #fff; }
+.abs { position: absolute; left: 0; top: 0; transform-origin: 50% 50%; will-change: transform, opacity; }
+canvas.abs { transform-origin: 0 0; }
+
+/* 漫画分格 */
+.panel { position: absolute; overflow: hidden; background: #fff; box-shadow: inset 0 0 0 9px #14101f; }
+.panel > .frame { position: absolute; inset: 0; box-shadow: inset 0 0 0 9px #14101f; pointer-events: none; z-index: 50; }
+
+/* 标题框（参考图一左上角） */
+.caption { position: absolute; padding: 14px 30px 12px; border: 6px solid #14101f; background: #ffe36e;
+  font-family: "KuaiLe", "NotoSC"; color: #14101f; transform-origin: 0 0; z-index: 40;
+  box-shadow: 8px 8px 0 #14101f; }
+.caption .zh { font-size: 58px; line-height: 1.1; white-space: nowrap; }
+.caption .en { font-family: "Bangers"; font-size: 30px; letter-spacing: 1.5px; margin-top: 4px; color: #3a2e5c; }
+.caption.blue { background: #cfe6ff; }
+
+/* 对白气泡 */
+.bubble { position: absolute; transform-origin: 0 50%; z-index: 30; }
+.bubble svg { position: absolute; left: 0; top: 0; overflow: visible; }
+.bubble .txt { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; font-family: "NotoSC"; font-weight: 900; color: #14101f; }
+.bubble .txt .zh { font-size: 50px; line-height: 1.18; }
+.bubble .txt .en { font-family: "Bangers"; font-size: 24px; letter-spacing: 1px; color: #6a5f8a; margin-top: 6px; }
+.hl { background: linear-gradient(transparent 62%, #ff8ec7 62%, #ff8ec7 88%, transparent 88%); }
+
+/* 拟声巨字 */
+.sfx { position: absolute; font-family: "HuangYou", "NotoSC"; white-space: nowrap; z-index: 45; transform-origin: 50% 60%;
+  paint-order: stroke fill; -webkit-text-stroke: 18px #fff; }
+.sfx .en { display: block; font-family: "Bangers"; text-align: center; -webkit-text-stroke: 10px #14101f; color: #ffe14d; }
+
+.char { position: absolute; transform-origin: 50% 100%; z-index: 20; }
+.flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 900; pointer-events: none; }

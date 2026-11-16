@@ -1,0 +1,125 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>04-cta · 特性速览 & 片尾</title>
+<link rel="stylesheet" href="../../shared/style.css">
+<style>
+  #root { position: absolute; inset: 0; background: #140d2e; overflow: hidden; }
+  /* 四个特性徽章 */
+  .feat { position: absolute; width: 520px; height: 150px; background: #fff; border: 6px solid #14101f;
+    border-radius: 18px; box-shadow: 10px 10px 0 #14101f; padding: 16px 24px; box-sizing: border-box;
+    font-family: "NotoSC"; z-index: 25; }
+  .feat .t { font-family: "KuaiLe"; font-size: 36px; color: #14101f; }
+  .feat .s { font-size: 21px; font-weight: 800; color: #54487a; margin-top: 6px; }
+  .feat .e { font-family: "Bangers"; font-size: 20px; letter-spacing: 1.5px; color: #d4388d; margin-top: 4px; }
+
+  /* 片尾主卡 */
+  #card { position: absolute; left: 110px; top: 150px; width: 1060px; height: 700px; background: rgba(25, 16, 56, 0.92);
+    border: 7px solid #ffe14d; border-radius: 28px; box-shadow: 16px 16px 0 #090518; padding: 36px 48px;
+    box-sizing: border-box; z-index: 30; color: #fff; font-family: "NotoSC"; }
+  #card .quote { font-family: "KuaiLe"; font-size: 54px; color: #ffe14d; text-shadow: 4px 4px 0 #14101f; }
+  #card .title { font-family: "KuaiLe"; font-size: 86px; margin-top: 10px;
+    background: linear-gradient(90deg, #fff, #ffb3e1, #9fd4ff); -webkit-background-clip: text; color: transparent;
+    filter: drop-shadow(4px 4px 0 #14101f); }
+  #card .en { font-family: "Bangers"; font-size: 42px; letter-spacing: 5px; color: #78e8ff; margin-top: -4px; }
+  #card .repo { display: inline-block; margin-top: 22px; padding: 10px 24px; background: #14101f; border: 4px solid #78e8ff;
+    border-radius: 14px; font-family: monospace; font-size: 28px; font-weight: 800; color: #fff; }
+  .prompt { margin-top: 14px; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); border-left: 6px solid #ff7ab2;
+    border-radius: 10px; font-size: 23px; font-weight: 700; color: #f3ecff; }
+</style>
+<script src="../../shared/kit.js"></script>
+<script src="../../shared/ui.js"></script>
+<script src="../../data/voice.js"></script>
+</head>
+<body>
+<div id="stage">
+  <div id="root">
+    <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
+    <div id="feats"></div>
+    <div id="card">
+      <div class="quote">“依旧两哈基米相互哈气就算审查了！”</div>
+      <div class="title">哈基米哈气审查</div>
+      <div class="en">HAKIMI HISS DUEL · ANTIGRAVITY PLUGIN</div>
+      <div class="repo">github.com/AOE20000/hakimi-hiss</div>
+      <div class="prompt">💬 “召唤两只哈基米对当前项目开启哈气找Bug大赛（决出一胜）”</div>
+      <div class="prompt">💬 “让哈基米A和B交叉修复对方找到的Bug（决出二胜，修坏的贴上啥子标记）”</div>
+    </div>
+  </div>
+  <div class="flash" id="flash"></div>
+</div>
+<script>
+const { tw, kf, ease, clamp, lerp, onTwos, rng } = K;
+const $ = (id) => document.getElementById(id);
+const A = "../../assets/chars/cut/";
+const S = {}; ["S14", "S15", "S16"].forEach((id) => (S[id] = K.seg(id)));
+
+const T0 = +(S.S14.start - 0.1).toFixed(3);
+const T1 = +window.VOICE.total.toFixed(3);
+window.SHOT = { start: T0, end: T1 };
+
+const E = {
+  cta: S.S15.start - 0.15,
+};
+
+let G = {};
+window.__ready = (async () => {
+  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
+  await document.fonts.load('900 50px "NotoSC"');
+  const im = await K.loadImages({ wink: A + "pose10.png", hissL: A + "pose03.png", hissR: A + "pose02.png" });
+  build(im);
+  await document.fonts.ready;
+})();
+
+function build(im) {
+  const root = $("root");
+  const fs = [
+    { x: 140, y: 180, t: "🧠 长期上下文保持", s: "持久化 conversationId，复审重修不断片", e: "PERSISTENT SUBAGENT MEMORY" },
+    { x: 700, y: 180, t: "⚡ 双 Worktree 隔离", s: "真并行修复 + 原子合并，自动降级波次乒乓", e: "PARALLEL GIT WORKTREES" },
+    { x: 140, y: 370, t: "🛡️ 实时防重通道", s: "同文件 ±5 行与相似描述当场拦截", e: "ZERO-DEPENDENCY STDIO MCP" },
+    { x: 700, y: 370, t: "🔄 随时手动重置", s: "一键洗牌重新开局，支持文件级或全项目审查", e: "INSTANT ARENA RESET" },
+  ];
+  G.feats = fs.map((f) => {
+    const d = UI.el("div", "feat", $("feats"), `<div class="t">${f.t}</div><div class="s">${f.s}</div><div class="e">${f.e}</div>`);
+    d.style.left = f.x + "px"; d.style.top = f.y + "px";
+    return d;
+  });
+  G.wink = UI.char(root, im.wink, { x: 1540, y: 1260, h: 1120 });
+}
+
+function render(t) {
+  const c = $("bg").getContext("2d");
+  const g = c.createRadialGradient(1400, 460, 60, 960, 540, 1300);
+  g.addColorStop(0, "#5e3eb8"); g.addColorStop(0.55, "#27185c"); g.addColorStop(1, "#100826");
+  c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
+  c.save(); c.globalAlpha = 0.12; K.rays(c, 1920, 1080, 1520, 480, 26, t * 0.06, "#fff", "rgba(0,0,0,0)"); c.restore();
+  const r = rng(77);
+  for (let i = 0; i < 36; i++) {
+    const x = r() * 1920, y = r() * 1080, sz = 8 + r() * 24, ph = r() * 6.28;
+    K.sparkle(c, x, y, sz * (0.4 + 0.6 * Math.abs(Math.sin(onTwos(t) * 3 + ph))), 0, i % 2 ? "#ffe14d" : "#fff", null);
+  }
+
+  const inCta = t >= E.cta;
+  G.feats.forEach((d, i) => {
+    const p = tw(t, T0 + 0.15 + i * 0.18, 0.35, ease.outBack);
+    const out = tw(t, E.cta - 0.1, 0.25);
+    UI.put(d, { s: p * (1 - out * 0.3), o: clamp(p * 3) * (1 - out), r: (i % 2 ? 1.5 : -1.5) });
+  });
+
+  const cp = tw(t, E.cta, 0.4, ease.outBack);
+  UI.put($("card"), { x: (1 - cp) * -200, s: cp, o: clamp(cp * 3) });
+
+  const wp = tw(t, T0 + 0.1, 0.5, ease.outCubic);
+  const bob = Math.sin(onTwos(t) * 4) * 8;
+  UI.put(G.wink, { x: (1 - wp) * 300, y: bob });
+
+  $("flash").style.opacity = Math.max(
+    kf(t, [[T0, 0.85], [T0 + 0.2, 0]]),
+    kf(t, [[E.cta - 0.02, 0], [E.cta + 0.04, 0.75], [E.cta + 0.2, 0]])
+  );
+}
+
+window.__seek = async (t) => { render(t); };
+</script>
+</body>
+</html>

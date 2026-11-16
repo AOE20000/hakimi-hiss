@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>02-round1 · 第一局：哈气找 Bug 与防重拦截</title>
+<link rel="stylesheet" href="../../shared/style.css">
+<style>
+  #root { position: absolute; inset: 0; background: #1e1836; }
+  /* 左右代码面板 + 中间通道计分板 */
+  .code-win { position: absolute; top: 145px; width: 610px; height: 740px; background: #131024; border: 6px solid #14101f;
+    border-radius: 18px; box-shadow: 10px 10px 0 #0c0918; overflow: hidden; font-family: monospace; z-index: 15; }
+  .code-win .bar { height: 48px; background: #261f42; border-bottom: 4px solid #14101f; display: flex; align-items: center;
+    padding: 0 18px; font-family: "NotoSC"; font-weight: 800; font-size: 22px; color: #e8e0ff; gap: 10px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
+  .code-win pre { margin: 0; padding: 18px 20px; font-size: 21px; line-height: 1.55; color: #cfc8ea; }
+  .ln { color: #5b527a; user-select: none; margin-right: 14px; }
+  .kw { color: #ff7ab2; } .fn { color: #78e8ff; } .str { color: #ffe16b; }
+  .bug-hl { position: absolute; left: 12px; right: 12px; height: 34px; background: rgba(255, 72, 110, 0.28);
+    border: 3px solid #ff486e; border-radius: 6px; pointer-events: none; }
+  .scan { position: absolute; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, transparent, #78e8ff, transparent); }
+
+  /* 中央哈气通道 */
+  #chan { position: absolute; left: 655px; top: 135px; width: 610px; height: 760px; background: #fff9ef;
+    border: 7px solid #14101f; border-radius: 22px; box-shadow: 12px 12px 0 #14101f; z-index: 20; overflow: hidden; }
+  #chan .hdr { height: 76px; background: linear-gradient(90deg, #ff7ab2, #8c6bff, #5fb8ff); border-bottom: 6px solid #14101f;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
+    font-family: "KuaiLe"; font-size: 36px; text-shadow: 3px 3px 0 #14101f; }
+  #chan .hdr span { font-family: "Bangers"; font-size: 19px; letter-spacing: 2px; color: #ffe14d; }
+  .score { display: flex; justify-content: space-between; align-items: center; padding: 14px 34px;
+    background: #231b3d; color: #fff; border-bottom: 5px solid #14101f; font-family: "KuaiLe"; }
+  .score .side { font-size: 32px; display: flex; align-items: center; gap: 14px; }
+  .score .num { font-family: "Bangers"; font-size: 64px; color: #ffe14d; -webkit-text-stroke: 3px #14101f; }
+  .score .vs { font-family: "Bangers"; font-size: 42px; color: #ff6fae; }
+
+  .card { position: absolute; left: 26px; width: 558px; height: 108px; background: #fff; border: 5px solid #14101f;
+    border-radius: 14px; box-shadow: 6px 6px 0 #14101f; padding: 10px 16px; box-sizing: border-box;
+    font-family: "NotoSC"; transform-origin: 50% 50%; }
+  .card .top { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 20px; }
+  .tag { padding: 2px 10px; border-radius: 6px; border: 3px solid #14101f; font-family: "Bangers"; font-size: 20px; }
+  .tag.A { background: #ffb5d8; color: #14101f; } .tag.B { background: #a8d8ff; color: #14101f; }
+  .tag.sev { background: #ff4d5e; color: #fff; }
+  .card .ttl { margin-top: 6px; font-size: 22px; font-weight: 800; color: #14101f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .card.dup { background: #ffe4e8; border-color: #d41c3c; }
+
+  /* 红色拦截印章 */
+  #stamp { position: absolute; left: 720px; top: 470px; width: 480px; padding: 16px 22px; border: 9px solid #d41c3c;
+    border-radius: 18px; background: rgba(255, 245, 245, 0.96); color: #d41c3c; text-align: center;
+    font-family: "HuangYou"; z-index: 60; box-shadow: 10px 10px 0 #14101f; transform-origin: 50% 50%; }
+  #stamp .big { font-size: 68px; line-height: 1.05; }
+  #stamp .sub { font-family: "Bangers"; font-size: 28px; letter-spacing: 2px; margin-top: 4px; color: #14101f; }
+
+  /* 一胜横幅 */
+  #win { position: absolute; left: 50%; top: 440px; width: 1080px; margin-left: -540px; padding: 24px 40px;
+    background: linear-gradient(90deg, #ffe14d, #ff9ad5, #ffe14d); border: 8px solid #14101f; border-radius: 26px;
+    box-shadow: 14px 14px 0 #14101f; text-align: center; z-index: 80; transform-origin: 50% 50%; white-space: nowrap; }
+  #win .zh { font-family: "KuaiLe"; font-size: 82px; color: #14101f; -webkit-text-stroke: 3px #fff; }
+  #win .en { font-family: "Bangers"; font-size: 38px; letter-spacing: 3px; color: #261b47; }
+</style>
+<script src="../../shared/kit.js"></script>
+<script src="../../shared/ui.js"></script>
+<script src="../../data/voice.js"></script>
+<script src="../../data/demo_channel.js"></script>
+</head>
+<body>
+<div id="stage">
+  <div id="root">
+    <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
+    <div class="code-win" id="winL" style="left:26px">
+      <div class="bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>src/session.py · 哈基米 A</div>
+      <pre>
+<span class="ln">38</span><span class="kw">def</span> <span class="fn">load_profile</span>(req):
+<span class="ln">39</span>    tok = req.headers.get(<span class="str">"Auth"</span>)
+<span class="ln">40</span>    user = <span class="fn">get_current_user</span>(tok)
+<span class="ln">41</span>    <span class="kw"># forgot null check!</span>
+<span class="ln">42</span>    uid = user.id
+<span class="ln">43</span>    role = user.role.strip()
+<span class="ln">44</span>    <span class="kw">return</span> db.<span class="fn">query</span>(uid, role)
+<span class="ln">45</span>
+<span class="ln">46</span><span class="kw">async def</span> <span class="fn">deduct</span>(oid, n):
+<span class="ln">47</span>    left = <span class="kw">await</span> stock.<span class="fn">get</span>(oid)
+<span class="ln">48</span>    <span class="kw">if</span> left >= n:
+<span class="ln">49</span>        <span class="kw">await</span> stock.<span class="fn">set</span>(oid, left - n)</pre>
+      <div class="bug-hl" id="hlL1" style="top:196px;height:68px"></div>
+      <div class="bug-hl" id="hlL2" style="top:345px;height:100px"></div>
+      <div class="scan" id="scanL"></div>
+    </div>
+
+    <div class="code-win" id="winR" style="left:1284px">
+      <div class="bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>src/db/pool.py · 哈基米 B</div>
+      <pre>
+<span class="ln">116</span><span class="kw">def</span> <span class="fn">run_tx</span>(sql, args):
+<span class="ln">117</span>    conn = pool.<span class="fn">acquire</span>()
+<span class="ln">118</span>    <span class="kw">if</span> conn.ping() <span class="kw">is False</span>:
+<span class="ln">119</span>        <span class="kw">raise</span> <span class="fn">TimeoutError</span>()
+<span class="ln">120</span>    <span class="kw"># leaked: conn never closed!</span>
+<span class="ln">121</span>    cur = conn.<span class="fn">cursor</span>()
+<span class="ln">122</span>    cur.<span class="fn">execute</span>(
+<span class="ln">123</span>        <span class="str">f"SELECT * ORDER BY {args}"</span>
+<span class="ln">124</span>    )
+<span class="ln">125</span>    <span class="kw">return</span> cur.<span class="fn">fetchall</span>()</pre>
+      <div class="bug-hl" id="hlR1" style="top:128px;height:100px"></div>
+      <div class="bug-hl" id="hlR2" style="top:262px;height:68px"></div>
+      <div class="scan" id="scanR"></div>
+    </div>
+
+    <div id="chan">
+      <div class="hdr">哈气互动通道 · 防重计分板<span>HAKIMI-HISS-CHANNEL · DEDUP ENGINE</span></div>
+      <div class="score">
+        <div class="side"><span class="tag A">GEMINI A</span><span class="num" id="scA">0</span></div>
+        <div class="vs">VS</div>
+        <div class="side"><span class="num" id="scB">0</span><span class="tag B">GEMINI B</span></div>
+      </div>
+      <div id="cards" style="position:relative"></div>
+    </div>
+
+    <div id="stamp"><div class="big">哈——！慢了一爪！</div><div class="sub">REJECTED · DUPLICATE (±5 LINES)</div></div>
+    <div id="win"><div class="zh">🏆 哈基米 A · 夺得【一胜】！</div><div class="en">ROUND 1 WINNER · MOST VALID BUGS</div></div>
+  </div>
+  <div class="flash" id="flash"></div>
+</div>
+<script>
+const { tw, kf, ease, clamp, lerp, shake, onTwos } = K;
+const $ = (id) => document.getElementById(id);
+const A = "../../assets/chars/cut/";
+const S = {}; ["S05", "S06", "S07", "S08", "S09", "S10"].forEach((id) => (S[id] = K.seg(id)));
+
+const T0 = +(S.S05.end + 1.6).toFixed(3);
+const T1 = +(S.S10.start - 0.1).toFixed(3);
+window.SHOT = { start: T0, end: T1 };
+
+// 事件时点
+const E = {
+  c1: S.S06.start + 3.2,     // A 登记 BUG-001
+  c2: S.S06.start + 4.8,     // B 登记 BUG-002
+  spot: S.S07.start,         // “抓到了！空指针，第四十二行！”
+  c3: S.S07.start + 1.2,     // A 登记 BUG-003
+  dupTry: S.S08.start - 0.15,// B 试图重复登记 session.py:44
+  dupHit: S.S08.start + 0.25,// 红章砸下 “哈——！慢了一爪！”
+  c4: S.S09.start + 0.6,     // B 改报 BUG-004
+  c5: S.S09.start + 1.3,     // A 登记 BUG-005
+  win: S.S09.start + 2.0,    // 决出【一胜】
+};
+
+let G = {};
+window.__ready = (async () => {
+  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
+  await document.fonts.load('68px "HuangYou"'); await document.fonts.load('900 50px "NotoSC"');
+  const im = await K.loadImages({
+    inspect: A + "pose04.png", smug: A + "pose05.png", shock: A + "pose06.png", hissR: A + "pose02.png",
+  });
+  build(im);
+  await document.fonts.ready;
+})();
+
+function build(im) {
+  const root = $("root");
+  G.cap = UI.caption(root, { x: 40, y: 26, zh: "第一局：哈气找 Bug 大赛（决出【一胜】）", en: "ROUND 1 · PARALLEL BUG HUNT & REAL-TIME DEDUP" });
+  // 左侧 A：先眯眼找，再比 V 得意
+  G.aInspect = UI.char(root, im.inspect, { x: 250, y: 1180, h: 680 });
+  G.aSmug = UI.char(root, im.smug, { x: 250, y: 1180, h: 680 });
+  // 右侧 B：先找（镜像 inspect），撞车后炸毛震惊
+  G.bInspect = UI.char(root, im.inspect, { x: 1670, y: 1180, h: 680 });
+  G.bShock = UI.char(root, im.shock, { x: 1670, y: 1180, h: 680 });
+  G.bL1 = UI.bubble(root, { x: 340, y: 580, w: 380, h: 160, zh: '<span style="font-size:36px">抓到了！L42 空指针！</span>', en: "GOT IT! LINE 42!", tail: [-50, 90] });
+
+  const items = [
+    { id: "BUG-001", who: "A", file: "src/session.py:42", ttl: "token 为空时直接解引用 user.id", t: E.c1 },
+    { id: "BUG-002", who: "B", file: "src/db/pool.py:118", ttl: "异常分支未归还数据库连接", t: E.c2 },
+    { id: "BUG-003", who: "A", file: "src/OrderService.ts:87", ttl: "并发扣减库存未加锁导致超卖", t: E.c3 },
+    { id: "DUP!", who: "B", file: "src/session.py:44", ttl: "user 为 None 时访问 user.id（±5行撞车！）", t: E.dupTry, dup: true },
+    { id: "BUG-004", who: "B", file: "src/api/search.py:31", ttl: "ORDER BY 直接拼接用户输入", t: E.c4 },
+    { id: "BUG-005", who: "A", file: "src/worker/queue.go:203", ttl: "重试计数未递增导致死循环", t: E.c5 },
+  ];
+  G.cards = items.map((it, idx) => {
+    const row = it.dup ? 3 : idx > 3 ? idx - 1 : idx;
+    const c = UI.el("div", "card" + (it.dup ? " dup" : ""), $("cards"),
+      `<div class="top"><span class="tag ${it.who}">GEMINI ${it.who}</span><span class="tag sev">${it.id}</span><span>${it.file}</span></div>` +
+      `<div class="ttl">${it.ttl}</div>`);
+    c.style.top = 16 + row * 116 + "px";
+    c._it = it;
+    return c;
+  });
+}
+
+function render(t) {
+  const c = $("bg").getContext("2d");
+  K.rays(c, 1920, 1080, 960, 540, 32, t * 0.04, "#28204a", "#1b1533");
+  if (t >= E.dupHit && t < E.c4) {
+    K.focusLines(c, 1920, 1080, 960, 520, 360, 110, t, { color: "#ff3b5c", alpha: 0.35, seed: 9 });
+  }
+
+  const [sx, sy] = shake(t, E.dupHit, 0.45, 20);
+  const [sx2, sy2] = shake(t, E.win, 0.4, 14);
+  $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
+
+  UI.put(G.cap, { s: tw(t, T0 + 0.05, 0.35, ease.outBack), r: -1 });
+
+  // 扫描线与高亮
+  $("scanL").style.top = 60 + ((t * 220) % 640) + "px";
+  $("scanR").style.top = 60 + (((t + 1.1) * 220) % 640) + "px";
+  $("hlL1").style.opacity = tw(t, E.c1 - 0.3, 0.25);
+  $("hlR1").style.opacity = tw(t, E.c2 - 0.3, 0.25);
+  $("hlL2").style.opacity = tw(t, E.c3 - 0.3, 0.25);
+  $("hlR2").style.opacity = tw(t, E.c4 - 0.3, 0.25);
+
+  // 卡片飞入 & 计分
+  let aCnt = 0, bCnt = 0;
+  G.cards.forEach((card) => {
+    const it = card._it;
+    if (it.dup) {
+      const pIn = tw(t, it.t, 0.22, ease.outBack);
+      const pOut = tw(t, E.c4 - 0.15, 0.25, ease.inQuad);
+      UI.put(card, { x: (1 - pIn) * 360 + pOut * 500, r: pOut * 18, o: clamp(pIn * 3) * (1 - pOut) });
+    } else {
+      const p = tw(t, it.t, 0.28, ease.outBack);
+      const fromX = it.who === "A" ? -380 : 380;
+      UI.put(card, { x: (1 - p) * fromX, s: p, o: clamp(p * 3) });
+      if (t >= it.t + 0.1) { if (it.who === "A") aCnt++; else bCnt++; }
+    }
+  });
+  $("scA").textContent = aCnt;
+  $("scB").textContent = bCnt;
+
+  // 红章 “哈——！慢了一爪！”
+  const sp = tw(t, E.dupHit, 0.2, ease.outBack);
+  const sOut = tw(t, E.c4 - 0.1, 0.25);
+  UI.put($("stamp"), { s: lerp(2.8, 1, sp), r: -8, o: clamp(sp * 4) * (1 - sOut) });
+
+  // 角色状态切换
+  const aWon = t >= E.dupHit;
+  const bob = Math.sin(onTwos(t) * 5) * 6;
+  UI.put(G.aInspect, { y: bob, o: aWon ? 0 : 1 });
+  UI.put(G.aSmug, { y: bob, s: aWon ? tw(t, E.dupHit, 0.25, ease.outBack) : 0, o: aWon ? 1 : 0 });
+  const bShocked = t >= E.dupHit && t < E.win + 0.5;
+  UI.put(G.bInspect, { sx: -1, y: -bob, o: bShocked ? 0 : 1 });
+  const jolt = bShocked ? Math.sin(onTwos(t, 24) * 30) * 8 : 0;
+  UI.put(G.bShock, { x: jolt, y: -Math.abs(jolt), o: bShocked ? 1 : 0 });
+
+  const bp = tw(t, E.spot, 0.25, ease.outBack) * (1 - tw(t, E.dupTry, 0.2));
+  UI.put(G.bL1, { s: bp, o: clamp(bp * 3) });
+
+  // 【一胜】横幅
+  const wp = tw(t, E.win, 0.35, ease.outBack);
+  UI.put($("win"), { s: wp, r: -1.5, o: clamp(wp * 3) });
+
+  $("flash").style.opacity = Math.max(
+    kf(t, [[T0, 0.9], [T0 + 0.2, 0]]),
+    kf(t, [[E.dupHit - 0.01, 0], [E.dupHit, 0.75], [E.dupHit + 0.12, 0]])
+  );
+}
+
+window.__seek = async (t) => { render(t); };
+</script>
+</body>
+</html>

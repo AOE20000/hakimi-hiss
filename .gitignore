@@ -5,6 +5,16 @@ data/arena_state.lock/
 data/arena_state.lock.*/
 data/worktrees/
 
+# Promo video build outputs & heavy generated audio
+promo/out/
+promo/voice/audition/
+promo/voice/audition_all.wav
+promo/voice/narration.wav
+promo/voice/segs/
+promo/sound/music/
+promo/assets/chars/raw/
+promo/assets/fonts/*.ttf
+
 # Python bytecode & caches
 **/__pycache__/
 *.py[cod]
