@@ -1,4 +1,4 @@
-// 暗黑机能风 UI 组件：B 风格的折角多边形气泡（A 风格霓虹毛玻璃材质）+ 系统规则通知弹窗。
+// 暗黑机能风 UI 组件 v3：折角气泡 + 强存在感系统规则弹窗（带入场扫光与脉冲冲击）+ 啥子符纸。
 (function () {
   const NS = "http://www.w3.org/2000/svg";
 
@@ -10,7 +10,7 @@
     return e;
   }
 
-  function hud(parent, { left = "AGENT_A · 橘座 // POV: 1ST-PERSON", mid = "HAKIMI-HISS-CHANNEL · STDIO MCP", right = "AGENT_B · 狸花" } = {}) {
+  function hud(parent, { left = "哈基米A (橘座 · 逻辑并发)", mid = "HAKIMI-HISS-CHANNEL · STDIO MCP", right = "哈基米B (狸花 · 边界安全)" } = {}) {
     return el("div", "hud-top", parent,
       `<div><span class="pill a">${left}</span></div>` +
       `<div>${mid}</div>` +
@@ -18,16 +18,13 @@
     );
   }
 
-  // B 风格折角多边形气泡，使用 A 风格深色机能描边与微光
-  // tailDir: "left" | "right" | "bottom-left" | "bottom-right" | "none"
-  // theme: "a" (粉) | "b" (蓝) | "v" (紫)
+  // B 风格折角多边形气泡（A 风格深色机能描边与微光）
   function polyBubble(parent, { x, y, w, h, who = "", zh, en = "", theme = "a", tailDir = "left", spiky = false }) {
     const b = el("div", "poly-bub", parent);
     Object.assign(b.style, { left: x + "px", top: y + "px", width: w + "px", height: h + "px" });
-    const stroke = theme === "a" ? "#ff7ab8" : theme === "b" ? "#6eb8ff" : "#a78bfa";
-    const glow = theme === "a" ? "rgba(255,122,184,0.28)" : theme === "b" ? "rgba(110,184,255,0.28)" : "rgba(167,139,250,0.28)";
+    const stroke = theme === "a" ? "#ff9e6e" : theme === "b" ? "#6eb8ff" : "#a78bfa";
+    const glow = theme === "a" ? "rgba(255,158,110,0.28)" : theme === "b" ? "rgba(110,184,255,0.28)" : "rgba(167,139,250,0.28)";
 
-    // 构造不对称折角多边形顶点 + 尖尾
     let pts;
     if (spiky) {
       pts = [
@@ -41,7 +38,6 @@
         [w * 0.52, h - 6], [14, h - 14], [5, h * 0.48],
       ];
     }
-    // 插入尾巴尖点
     let origin = [w / 2, h / 2];
     if (tailDir === "left") {
       pts.splice(7, 0, [10, h * 0.72], [-28, h * 0.86], [22, h - 12]);
@@ -58,7 +54,6 @@
     }
 
     const ptStr = pts.map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`).join(" ");
-    // 内层细线多边形（机能双层边框感）
     const inStr = pts
       .filter((_, i) => !tailDir || tailDir === "none" || Math.hypot(pts[i][0] - origin[0], pts[i][1] - origin[1]) > 6)
       .map(([px, py]) => `${(w / 2 + (px - w / 2) * 0.93).toFixed(1)},${(h / 2 + (py - h / 2) * 0.90).toFixed(1)}`)
@@ -66,13 +61,13 @@
 
     const svg = document.createElementNS(NS, "svg");
     svg.setAttribute("width", w); svg.setAttribute("height", h);
-    svg.style.filter = `drop-shadow(0 16px 36px rgba(0,0,0,0.72)) drop-shadow(0 0 18px ${glow})`;
+    svg.style.filter = `drop-shadow(0 16px 36px rgba(0,0,0,0.75)) drop-shadow(0 0 18px ${glow})`;
     svg.innerHTML =
-      `<polygon points="${ptStr}" fill="rgba(12, 14, 26, 0.90)" stroke="${stroke}" stroke-width="2.6" stroke-linejoin="miter"/>` +
-      `<polygon points="${inStr}" fill="none" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>`;
+      `<polygon points="${ptStr}" fill="rgba(12, 14, 26, 0.92)" stroke="${stroke}" stroke-width="2.6" stroke-linejoin="miter"/>` +
+      `<polygon points="${inStr}" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>`;
     b.appendChild(svg);
 
-    const whoColor = theme === "a" ? "#ff9ed2" : theme === "b" ? "#93ccff" : "#d8b4fe";
+    const whoColor = theme === "a" ? "#ffb088" : theme === "b" ? "#93ccff" : "#d8b4fe";
     el("div", "txt", b,
       (who ? `<div class="who" style="color:${whoColor}">${who}</div>` : "") +
       `<div class="zh">${zh}</div>` +
@@ -82,19 +77,48 @@
     return b;
   }
 
-  // 系统规则通知弹窗
-  // kind: "" (紫/常规规则) | "warn" (红/拦截或打回) | "ok" (绿/通过) | "gold" (金/胜负裁决)
-  function sysNotice(parent, { x, y, w = 680, code = "SYSTEM RULE // ACTIVE", badge = "ENFORCED", zh, en, kind = "" }) {
+  // 强存在感【系统规则通知】弹窗
+  function sysNotice(parent, { x, y, w = 860, code = "SYSTEM NOTICE // ACTIVE RULE", badge = "ENFORCED", tag = "", zh, en = "", kind = "" }) {
     const n = el("div", "sys-notice " + kind, parent,
-      `<div class="hdr"><span><i class="dot"></i>${code}</span><span class="badge">${badge}</span></div>` +
-      `<div class="rule-zh">${zh}</div>` +
-      (en ? `<div class="rule-en">${en}</div>` : "")
+      `<div class="hdr"><span class="left"><i class="pulse-dot"></i>${code}</span><span class="badge">${badge}</span></div>` +
+      `<div class="hazard"></div>` +
+      `<div class="body">` +
+        (tag ? `<div class="rule-tag">${tag}</div>` : "") +
+        `<div class="rule-zh">${zh}</div>` +
+        (en ? `<div class="rule-en">${en}</div>` : "") +
+        `<div class="scan-flash"></div>` +
+      `</div>`
     );
     Object.assign(n.style, { left: x + "px", top: y + "px", width: w + "px" });
+    n._scan = n.querySelector(".scan-flash");
     return n;
   }
 
-  function sfxSerif(parent, { x, y, zh, sub, size = 148, subColor = "#ff8ec7", align = "left" }) {
+  // 弹窗专属入场更新：带 1.28x → 1.0x 砸下弹性缩放 + 扫光条扫过 + 呼吸微动
+  function putNotice(n, t, t0, { outT = 1e9, yFrom = -36 } = {}) {
+    const pIn = K.tw(t, t0, 0.26, K.ease.outBack);
+    const pOut = K.tw(t, outT, 0.22, K.ease.inQuad);
+    const o = K.clamp(pIn * 3.5) * (1 - pOut);
+    const s = K.lerp(1.26, 1.0, pIn) * (1 - pOut * 0.12);
+    const y = (1 - pIn) * yFrom;
+    n.style.transform = `translate(0px,${y}px) scale(${s})`;
+    n.style.opacity = o;
+    n.style.visibility = o <= 0.001 ? "hidden" : "visible";
+    if (n._scan) {
+      const sp = K.clamp((t - t0) / 0.38);
+      n._scan.style.transform = `translateX(${(sp * 220 - 110)}%)`;
+      n._scan.style.opacity = sp < 1 ? (1 - sp) : 0;
+    }
+  }
+
+  // 黄色【啥子】符纸
+  function talisman(parent, { x, y }) {
+    const d = el("div", "talisman", parent, `<div class="t-zh">啥子</div><div class="t-seal">重修</div>`);
+    Object.assign(d.style, { left: x + "px", top: y + "px" });
+    return d;
+  }
+
+  function sfxSerif(parent, { x, y, zh, sub, size = 148, subColor = "#ffb088", align = "left" }) {
     const s = el("div", "sfx-serif", parent,
       `${zh}<span class="sub" style="color:${subColor};text-align:${align}">${sub}</span>`
     );
@@ -116,5 +140,5 @@
     e.style.visibility = o <= 0.001 ? "hidden" : "visible";
   }
 
-  window.UI = { el, hud, polyBubble, sysNotice, sfxSerif, char, put };
+  window.UI = { el, hud, polyBubble, sysNotice, putNotice, talisman, sfxSerif, char, put };
 })();

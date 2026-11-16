@@ -2,45 +2,53 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>03-round2 · 第二局：看见交叉修复通知 → 互哈互验通知 → 终审二胜与啥子通知</title>
+<title>03-round2 · S08 双 Worktree 交叉飞虫 → S09 互哈互验驳回死锁 → S10 铲屎官终审二胜 & 脑门贴啥子符纸</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
   #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
   #phaseA, #phaseB { position: absolute; inset: 0; }
 
-  .wt-box { position: absolute; top: 100px; width: 610px; height: 420px; background: rgba(11, 13, 24, 0.88);
-    backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.14);
-    box-shadow: 0 24px 60px rgba(0,0,0,0.78); overflow: hidden; font-family: "Mono"; z-index: 15; }
+  .wt-box { position: absolute; top: 96px; width: 590px; height: 420px; background: rgba(11, 13, 24, 0.90);
+    backdrop-filter: blur(14px); border: 1.5px solid rgba(255,255,255,0.16);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.82); overflow: hidden; font-family: "Mono"; z-index: 15; }
   .wt-box .hdr { height: 42px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
-    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.10); }
-  .wt-box.A .hdr { background: rgba(255, 122, 184, 0.12); color: #ff9ed2; }
-  .wt-box.B .hdr { background: rgba(110, 184, 255, 0.12); color: #93ccff; }
-  .wt-box pre { margin: 0; padding: 16px 20px; font-size: 16.5px; line-height: 1.58; color: #c7d0f0; }
+    font-size: 13px; font-weight: 800; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.12); }
+  .wt-box.A { border-top: 3px solid #ff9e6e; }
+  .wt-box.A .hdr { background: rgba(255, 158, 110, 0.16); color: #ffbd9b; }
+  .wt-box.B { border-top: 3px solid #6eb8ff; }
+  .wt-box.B .hdr { background: rgba(110, 184, 255, 0.16); color: #93ccff; }
+  .wt-box pre { margin: 0; padding: 14px 20px; font-size: 16px; line-height: 1.56; color: #c7d0f0; }
   .del { color: #ff6b8b; background: rgba(255, 77, 109, 0.14); display: block; }
   .add { color: #5ef29c; background: rgba(74, 222, 128, 0.13); display: block; }
-  .cmd { margin: 8px 18px 0; padding: 8px 14px; background: rgba(5, 6, 12, 0.85); border: 1px solid rgba(255,255,255,0.08);
-    font-size: 14px; letter-spacing: 1px; }
+  .bad { color: #ff8fa3; background: rgba(255, 59, 92, 0.22); display: block; border-left: 3px solid #ff3b5c; padding-left: 6px; }
+  .cmd { margin: 6px 18px 0; padding: 8px 14px; background: rgba(5, 6, 12, 0.90); border: 1px solid rgba(255,255,255,0.12);
+    font-size: 13.5px; font-weight: 700; letter-spacing: 1px; }
+
+  /* 交叉飞行的 Bug 胶囊 */
+  .bug-pill { position: absolute; padding: 8px 18px; font-family: "Mono"; font-weight: 800; font-size: 15px;
+    border-radius: 999px; letter-spacing: 1.5px; z-index: 40; box-shadow: 0 12px 30px rgba(0,0,0,0.8); }
+  .bug-pill.fromA { background: rgba(45, 18, 12, 0.95); border: 2px solid #ff9e6e; color: #ffd1b8; }
+  .bug-pill.fromB { background: rgba(10, 24, 48, 0.95); border: 2px solid #6eb8ff; color: #bae0ff; }
+
+  /* A 拍向 B 屏幕的【驳回 REJECT】巨型红印 */
+  #rej-stamp { position: absolute; left: 1450px; top: 185px; padding: 14px 30px;
+    background: rgba(48, 6, 16, 0.96); border: 4px solid #ff3b5c; color: #ff8fa3;
+    font-family: "SerifSC"; font-weight: 900; font-size: 54px; letter-spacing: 6px;
+    box-shadow: 0 0 50px rgba(255, 59, 92, 0.85), 0 20px 45px rgba(0,0,0,0.9); z-index: 260; }
+  #rej-stamp span { display: block; font-family: "Mono"; font-size: 13px; letter-spacing: 3px; color: #fecdd3; text-align: center; margin-top: 4px; }
 
   /* 阶段 B：铲屎官终审卡片 */
-  .judge-card { position: absolute; top: 105px; width: 620px; height: 210px; background: rgba(12, 14, 28, 0.90);
-    backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+  .judge-card { position: absolute; top: 96px; width: 620px; height: 210px; background: rgba(12, 14, 28, 0.92);
+    backdrop-filter: blur(16px); border: 1.5px solid rgba(255,255,255,0.16); box-shadow: 0 24px 60px rgba(0,0,0,0.85);
     padding: 20px 26px; box-sizing: border-box; z-index: 20; }
-  .judge-card.A { border-top: 3px solid #4ade80; }
-  .judge-card.B { border-top: 3px solid #ff4d6d; }
-  .judge-card .k { font-family: "Mono"; font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
-  .judge-card .v { font-family: "SansSC"; font-weight: 800; font-size: 23px; color: #fff; margin-top: 6px; }
-  .judge-card .badge { display: inline-block; margin-top: 14px; padding: 5px 16px; font-family: "Mono";
+  .judge-card.A { border-top: 4px solid #fbbf24; box-shadow: 0 24px 60px rgba(0,0,0,0.85), 0 0 50px rgba(251,191,36,0.28); }
+  .judge-card.B { border-top: 4px solid #ff3b5c; }
+  .judge-card .k { font-family: "Mono"; font-size: 13px; font-weight: 800; letter-spacing: 2px; color: rgba(255,255,255,0.6); }
+  .judge-card .v { font-family: "SansSC"; font-weight: 900; font-size: 23px; color: #fff; margin-top: 8px; }
+  .judge-card .badge { display: inline-block; margin-top: 14px; padding: 6px 18px; font-family: "Mono";
     font-weight: 800; font-size: 18px; letter-spacing: 2px; }
-  .judge-card.A .badge { background: rgba(74, 222, 128, 0.15); border: 1px solid #4ade80; color: #86efac; }
-  .judge-card.B .badge { background: rgba(255, 77, 109, 0.16); border: 1px solid #ff4d6d; color: #ff8fa3; }
-
-  /* 机能风【啥子】全息烙印（贴在 B 头上） */
-  #shazi-tag { position: absolute; left: 1180px; top: 340px; padding: 12px 26px;
-    background: rgba(38, 8, 18, 0.92); border: 2px solid #ff4d6d;
-    box-shadow: 0 0 40px rgba(255, 77, 109, 0.55), 0 18px 40px rgba(0,0,0,0.8);
-    text-align: center; z-index: 90; transform-origin: 50% 50%; }
-  #shazi-tag .zh { font-family: "SerifSC"; font-weight: 900; font-size: 72px; color: #ff6b8b; letter-spacing: 4px; line-height: 1; }
-  #shazi-tag .en { font-family: "Mono"; font-weight: 800; font-size: 13px; letter-spacing: 3px; color: #fda4af; margin-top: 4px; }
+  .judge-card.A .badge { background: rgba(251, 191, 36, 0.20); border: 1.5px solid #fbbf24; color: #fde68a; }
+  .judge-card.B .badge { background: rgba(255, 59, 92, 0.20); border: 1.5px solid #ff3b5c; color: #fda4af; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -54,8 +62,8 @@
     <div class="bg-type" style="right:40px;top:90px">ROUND_02</div>
 
     <div id="phaseA">
-      <div class="wt-box A" id="wtA" style="left:50px">
-        <div class="hdr"><span>WORKTREE // fix-A (fixes BUG-002 from B)</span><span>src/db/pool.py</span></div>
+      <div class="wt-box A" id="wtA" style="left:46px">
+        <div class="hdr"><span>WORKTREE // fix-A (修 B 抓的 BUG-002)</span><span>src/db/pool.py</span></div>
         <pre>
  def run_tx(sql, args):
      conn = pool.acquire()
@@ -67,36 +75,38 @@
 <span class="add">+        return conn.execute(sql, args)</span>
 <span class="add">+    finally:</span>
 <span class="add">+        conn.close()</span></pre>
-        <div class="cmd" style="color:#86efac">$ pytest tests/test_pool.py // 12 PASSED [0.18s]</div>
+        <div class="cmd" style="color:#86efac">$ pytest tests/test_pool.py // 12 PASSED · 0 DEADLOCK</div>
       </div>
 
-      <div class="wt-box B" id="wtB" style="left:1260px">
-        <div class="hdr"><span>WORKTREE // fix-B (fixes BUG-001 from A)</span><span>src/session.py</span></div>
+      <div class="wt-box B" id="wtB" style="left:1284px">
+        <div class="hdr"><span>WORKTREE // fix-B (修 A 抓的 BUG-001)</span><span>src/session.py</span></div>
         <pre>
  def load_profile(req):
      tok = req.headers.get("Auth")
-     user = get_current_user(tok)
-<span class="del">-    uid = user.id</span>
-<span class="add">+    try:</span>
-<span class="add">+        uid = user.id</span>
-<span class="add">+    except Exception:</span>
-<span class="add">+        return {}  # swallowed!</span></pre>
-        <div class="cmd" style="color:#ff8fa3">$ pytest tests/test_auth.py // 2 FAILED [auth bypass]</div>
+<span class="bad">+    with GLOBAL_SESSION_LOCK:  # 粗粒度全局大锁!</span>
+<span class="bad">+        user = get_current_user(tok)</span>
+<span class="bad">+        if user is None:</span>
+<span class="bad">+            return refresh_token_with_lock(tok)</span>
+     return {"id": user.id}</pre>
+        <div class="cmd" style="color:#ff8fa3">$ pytest tests/test_concurrent.py // HANG! DEADLOCK REGRESSION</div>
       </div>
+
+      <div class="bug-pill fromA" id="flyAB">BUG-001 (橘座抓) ➔ 交由狸花修</div>
+      <div class="bug-pill fromB" id="flyBA">BUG-002 (狸花抓) ➔ 交由橘座修</div>
+      <div id="rej-stamp">驳回重修<span>REJECT_WITH_HISS // DEADLOCK</span></div>
     </div>
 
     <div id="phaseB">
-      <div class="judge-card A" id="jcA" style="left:90px">
-        <div class="k">HUMAN ARBITRATION // AGENT_A FIX</div>
-        <div class="v">finally 块确保异常分支归还连接 + 参数化查询</div>
-        <div class="badge">VERDICT: PERFECT // 夺得【二胜】</div>
+      <div class="judge-card A" id="jcA" style="left:80px">
+        <div class="k">HUMAN FINAL VERDICT // 哈基米A（橘座）</div>
+        <div class="v">finally 安全释放连接 + 零回归通过全套并发测试</div>
+        <div class="badge">PERFECT 100% // 夺得【二胜】🏆</div>
       </div>
-      <div class="judge-card B" id="jcB" style="left:1210px">
-        <div class="k">HUMAN ARBITRATION // AGENT_B FIX</div>
-        <div class="v">裸 except 吞掉空指针异常，导致未登录用户越权</div>
-        <div class="badge">VERDICT: FAILED // 贴标【啥子】</div>
+      <div class="judge-card B" id="jcB" style="left:1220px">
+        <div class="k">HUMAN FINAL VERDICT // 哈基米B（狸花）</div>
+        <div class="v">粗粒度全局大锁导致嵌套死锁，触发返工标记</div>
+        <div class="badge">VERDICT: FAILED // 脑门贴【啥子】</div>
       </div>
-      <div id="shazi-tag"><div class="zh">【啥子】</div><div class="en">TAG: DUMMY // PENDING RE-FIX</div></div>
     </div>
   </div>
   <div class="vignette"></div>
@@ -108,17 +118,17 @@ const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
 const S = {}; ["S08", "S09", "S10", "S11"].forEach((id) => (S[id] = K.seg(id)));
 
-const T0 = +(S.S08.start - 0.1).toFixed(3);
+const T0 = +(S.S08.start - 0.15).toFixed(3);
 const T1 = +(S.S11.start - 0.1).toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
 const E = {
-  sysCross: T0 + 0.1,         // 系统通知：第二局交叉修复启动（B 看着通知吐槽 S08）
-  wt: S.S08.start + 1.8,      // 左右 Worktree 面板展开
-  sysVer: S.S09.start - 0.2,  // 系统通知：互哈互验开启（A 看着通知念 S09 并点驳回）
-  rejClick: S.S09.start + 4.4,// A 点下 REJECT_WITH_HISS
-  judge: S.S10.start - 0.3,   // 切到阶段 B：系统弹出铲屎官终审通知（B 看着通知哭诉 S10）
-  shazi: S.S10.start + 2.2,   // 【啥子】全息标签啪地贴在 B 旁边
+  sysCross: T0 + 0.08,        // S08：双 Worktree 真并行交叉修复弹窗
+  fly: S.S08.start + 0.5,     // Bug 胶囊交叉飞向对方沙盒
+  sysVer: S.S09.start - 0.15, // S09：互哈互验触发 REJECT_WITH_HISS 弹窗
+  rejSlam: S.S09.start + 1.8, // A 一爪拍下「驳回重修」红印砸在 B 屏幕上
+  judge: S.S10.start - 0.25,  // S10：切入终审阶段 + 铲屎官终审裁决金框弹窗
+  talisman: S.S10.start + 1.1,// 黄色【啥子】符纸啪地贴在 B 脑门上（配敲锣声）
 };
 
 let G = {};
@@ -135,48 +145,64 @@ window.__ready = (async () => {
 
 function build(im) {
   const root = $("root"), pA = $("phaseA"), pB = $("phaseB");
-  UI.hud(root, { left: "AGENT_A · 橘座 // CROSS-FIX", mid: "PHASE: ROUND2_CROSS_FIX · GIT WORKTREE ISOLATION", right: "AGENT_B · 狸花 // CROSS-FIX" });
+  UI.hud(root, { left: "哈基米A（橘座）// WORKTREE: fix-A", mid: "ROUND2_CROSS_FIX · DUAL GIT WORKTREE SANDBOX", right: "哈基米B（狸花）// WORKTREE: fix-B" });
 
-  // 阶段 A 角色与气泡
-  G.aType = UI.char(pA, im.typing, { x: 460, y: 1220, h: 740, cls: "glow-a" });
-  G.aJudge = UI.char(pA, im.cross, { x: 480, y: 1220, h: 740, cls: "glow-a" });
-  G.bType = UI.char(pA, im.typing, { x: 1460, y: 1220, h: 740, cls: "glow-b" });
+  // 阶段 A 角色
+  G.aType = UI.char(pA, im.typing, { x: 430, y: 1220, h: 730, cls: "glow-a" });
+  G.aJudge = UI.char(pA, im.cross, { x: 450, y: 1220, h: 740, cls: "glow-a" });
+  G.bType = UI.char(pA, im.typing, { x: 1490, y: 1220, h: 730, cls: "glow-b" });
 
+  // S08 强存在感系统弹窗：双 Worktree 真并行交叉修复
   G.sysCross = UI.sysNotice(pA, {
-    x: 560, y: 100, w: 800, code: "SYSTEM NOTICE // RULE 03: PARALLEL WORKTREE CROSS-FIX", badge: "ASSIGNED",
-    zh: "【第二局：隔离工作树交叉修复】A 修 B 抓的 Bug · B 修 A 抓的 Bug（自动降级波次乒乓）",
-    en: "hakimi_start_cross_fix(mode='auto') -> isolated git worktrees spawned for A & B",
+    x: 520, y: 92, w: 880,
+    code: "SYSTEM NOTICE // ROUND 2: DUAL GIT WORKTREE CROSS-FIX",
+    badge: "ISOLATED SANDBOX",
+    tag: "PARALLEL_WORKTREE · ZERO BRANCH COLLISION",
+    zh: "【第二局：双 Worktree 真并行交叉修复】A 修 B 抓的 Bug · B 修 A 抓的 Bug（隔离分支零踩踏）",
+    en: "hakimi_start_cross_fix(mode='auto') -> worktree/fix-A & worktree/fix-B mounted",
   });
+
+  // S09 强存在感红色拦截弹窗：互哈互验触发 REJECT_WITH_HISS
   G.sysVer = UI.sysNotice(pA, {
-    x: 560, y: 330, w: 800, code: "SYSTEM NOTICE // RULE 04: MUTUAL HISS-VERIFY", badge: "REJECT_WITH_HISS", kind: "warn",
-    zh: "【互哈互验通知】原发现者 A 审查 B 的修复：触发 REJECT_WITH_HISS，当场打回重修！",
-    en: "hakimi_report_verify(bug_id='BUG-001', verdict='REJECT_WITH_HISS') -> sent back to B",
+    x: 500, y: 318, w: 920,
+    code: "SYSTEM ALERT // MUTUAL HISS-VERIFY TRIGGERED",
+    badge: "REJECT_WITH_HISS",
+    tag: "FINDER: 橘座 (A) -> FIXER: 狸花 (B) · RETURN TO IN_CROSS_FIX",
+    kind: "warn",
+    zh: "【互哈互验触发 REJECT_WITH_HISS】原发现者 A 驳回 BUG-001 修复：粗暴加锁导致死锁回归，退回 IN_CROSS_FIX 返工！",
+    en: "hakimi_report_verify(bug_id='BUG-001', verdict='REJECT_WITH_HISS', reason='coarse lock deadlock')",
   });
 
   G.bB8 = UI.polyBubble(pA, {
-    x: 920, y: 545, w: 560, h: 175, who: "GEMINI_B // READING ROUND 2 NOTICE", theme: "b", tailDir: "right",
-    zh: '「隔离工作树交叉修复，互修对方的虫子」？！<br>行，<span class="hl-b">套个 try-except 糊弄过去！</span>',
-    en: "FIX HER BUGS IN WORKTREES?! FINE, SLAP A TRY-EXCEPT ON IT!",
+    x: 880, y: 555, w: 620, h: 190, who: "B（狸花）// SLAPPING A COARSE GLOBAL LOCK", theme: "b", tailDir: "right",
+    zh: '哼，交叉修就交叉修！看本喵怎么把你抓的并发 Bug 修出花来……<span class="hl-b">先加把粗粒度大锁交差！</span>',
+    en: "CROSS-FIX IN WORKTREES? FINE—I'LL JUST SLAP A COARSE GLOBAL LOCK ON IT!",
   });
   G.bA9 = UI.polyBubble(pA, {
-    x: 440, y: 545, w: 580, h: 180, who: "GEMINI_A // TRIGGERING REJECT_WITH_HISS", theme: "a", tailDir: "left", spiky: true,
-    zh: '系统提示轮到本喵「互哈互验」——<br>空 except 吞异常？<span class="hl-a">点驳回，打回重修！</span>',
-    en: "SYSTEM PROMPTED HISS-VERIFY—BARE EXCEPT?! CLICKING REJECT!",
+    x: 420, y: 555, w: 630, h: 190, who: "A（橘座）// SLAMMING REJECT ON B'S DEADLOCK", theme: "a", tailDir: "left", spiky: true,
+    zh: '本喵抓的虫本喵最清楚——拿把全局死锁就想蒙混过关？<span class="hl-a">哈——！打回重修！</span>',
+    en: "FOOL THE ORIGINAL FINDER WITH A GLOBAL DEADLOCK?! HISS—REJECTED!",
   });
 
-  // 阶段 B 角色、系统通知与气泡
-  G.aWin = UI.char(pB, im.smug, { x: 640, y: 1230, h: 820, cls: "glow-a" });
-  G.bDizzy = UI.char(pB, im.dizzy, { x: 1300, y: 1230, h: 820, cls: "glow-b" });
+  // 阶段 B 角色与金框终审弹窗 + 黄色【啥子】符纸（贴在 B 脑门正中央）
+  G.aWin = UI.char(pB, im.smug, { x: 610, y: 1230, h: 830, cls: "glow-a" });
+  G.bDizzy = UI.char(pB, im.dizzy, { x: 1310, y: 1230, h: 830, cls: "glow-b" });
+  G.talisman = UI.talisman(pB, { x: 1255, y: 390 });
 
   G.sysJudge = UI.sysNotice(pB, {
-    x: 540, y: 345, w: 840, code: "SYSTEM NOTICE // RULE 05: FINAL VERDICT & 【啥子】 TAG", badge: "【二胜】 / 【啥子】", kind: "gold",
-    zh: "【终审裁决通告】哈基米A 获评 PERFECT 夺得【二胜】· 哈基米B 获评 FAILED 贴上【啥子】标记",
-    en: "hakimi_judge_round2 -> round2_winner: A · BUG-001 tagged 【啥子】 (kept pending for re-fix)",
+    x: 490, y: 325, w: 940,
+    code: "SYSTEM VERDICT // HUMAN ARBITRATION & AUTO-TAGGING",
+    badge: "【二胜】 & 【啥子】",
+    tag: "WORKTREE MERGED · A: 100% PERFECT · B: FAILED -> TAG 【啥子】",
+    kind: "gold",
+    zh: "【铲屎官终审裁决】哈基米A 完美率 100% 夺得【二胜】！哈基米B 触发 FAILED，自动贴上【啥子】耻辱标记！",
+    en: "hakimi_judge_round2 -> round2_winner: A (PERFECT) · B tagged 【啥子】 for mandatory re-fix",
   });
+
   G.bB10 = UI.polyBubble(pB, {
-    x: 720, y: 555, w: 560, h: 175, who: "GEMINI_B // READING VERDICT NOTICE", theme: "b", tailDir: "right", spiky: true,
-    zh: '终审通知判你拿【二胜】，<br>居然给本喵贴了个<span class="hl-b">「啥子」标记？！</span>',
-    en: "YOU GET ROUND 2 AND IT BRANDED ME WITH A 'DUMMY' TAG?!",
+    x: 640, y: 575, w: 640, h: 185, who: "B（狸花）// FOREHEAD SLAPPED WITH 【啥子】 TALISMAN!", theme: "b", tailDir: "right", spiky: true,
+    zh: '喵呜？！你拿「二胜」就算了，<br>铲屎官干嘛往本喵脑门上<span class="hl-b">贴「啥子」符纸啊！！</span>',
+    en: "MEOW?! FINE, TAKE ROUND 2, BUT WHY SLAP A 'DUMMY' TALISMAN ON MY FOREHEAD?!",
   });
 }
 
@@ -186,33 +212,46 @@ function render(t) {
   c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
 
   if (!inB) {
-    const g = c.createRadialGradient(960, 440, 40, 960, 440, 880);
-    g.addColorStop(0, t >= E.rejClick ? "rgba(255, 64, 104, 0.22)" : "rgba(110, 184, 255, 0.14)");
+    const g = c.createRadialGradient(960, 420, 40, 960, 420, 880);
+    g.addColorStop(0, t >= E.sysVer ? "rgba(255, 59, 92, 0.25)" : "rgba(110, 184, 255, 0.16)");
     g.addColorStop(1, "rgba(7, 8, 17, 0)");
     c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   } else {
-    let g = c.createRadialGradient(540, 520, 30, 540, 520, 700);
-    g.addColorStop(0, "rgba(74, 222, 128, 0.22)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    let g = c.createRadialGradient(540, 520, 30, 540, 520, 720);
+    g.addColorStop(0, "rgba(251, 191, 36, 0.28)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
     c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
     g = c.createRadialGradient(1380, 520, 30, 1380, 520, 700);
-    g.addColorStop(0, "rgba(255, 77, 109, 0.26)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    g.addColorStop(0, "rgba(255, 59, 92, 0.26)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
     c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   }
 
-  let [sx, sy] = shake(t, E.rejClick, 0.4, 16);
-  const [sx2, sy2] = shake(t, E.shazi, 0.45, 20);
+  let [sx, sy] = shake(t, E.rejSlam, 0.42, 18);
+  const [sx2, sy2] = shake(t, E.talisman, 0.48, 22);
   $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
   $("phaseA").style.display = inB ? "none" : "block";
   $("phaseB").style.display = inB ? "block" : "none";
 
   if (!inB) {
-    const pSysC = tw(t, E.sysCross, 0.28, ease.outBack);
-    UI.put(G.sysCross, { y: (1 - pSysC) * -30, s: pSysC, o: clamp(pSysC * 3) });
-
-    const wp = tw(t, E.wt, 0.32, ease.outBack);
+    const wp = tw(t, T0 + 0.05, 0.34, ease.outBack);
     UI.put($("wtA"), { x: (1 - wp) * -260, s: wp, o: clamp(wp * 3) });
     UI.put($("wtB"), { x: (1 - wp) * 260, s: wp, o: clamp(wp * 3) });
+
+    // 强存在感系统通知弹窗 S08 & S09
+    UI.putNotice(G.sysCross, t, E.sysCross);
+    UI.putNotice(G.sysVer, t, E.sysVer);
+
+    // 交叉飞虫动画（A 的虫飞向 B，B 的虫飞向 A）
+    const fp = clamp((t - E.fly) / 1.15);
+    const fOut = 1 - tw(t, E.fly + 1.35, 0.25);
+    const fShow = t >= E.fly ? fOut : 0;
+    const arc = Math.sin(fp * Math.PI) * -70;
+    UI.put($("flyAB"), { x: lerp(380, 1280, ease.inOutCubic(fp)), y: 260 + arc, s: 0.95, o: fShow });
+    UI.put($("flyBA"), { x: lerp(1280, 380, ease.inOutCubic(fp)), y: 320 - arc, s: 0.95, o: fShow });
+
+    // A 一爪拍下「驳回重修」红印
+    const rp = tw(t, E.rejSlam, 0.22, ease.outBack);
+    UI.put($("rej-stamp"), { s: lerp(2.5, 1, rp), r: -10, o: clamp(rp * 4) });
 
     const rejOn = t >= E.sysVer;
     const typo = Math.sin(onTwos(t, 24) * 26) * 5;
@@ -220,37 +259,42 @@ function render(t) {
     UI.put(G.aJudge, { sx: -1, s: rejOn ? tw(t, E.sysVer, 0.25, ease.outBack) : 0, o: rejOn ? 1 : 0 });
     UI.put(G.bType, { sx: -1, y: -typo });
 
-    const pB8 = tw(t, S.S08.start + 0.2, 0.26, ease.outBack) * (1 - tw(t, E.sysVer, 0.2));
+    const pB8 = tw(t, S.S08.start + 0.15, 0.26, ease.outBack) * (1 - tw(t, E.sysVer, 0.2));
     const pA9 = tw(t, S.S09.start + 0.1, 0.26, ease.outBack);
     UI.put(G.bB8, { s: pB8, o: clamp(pB8 * 3), r: 1 });
     UI.put(G.bA9, { s: pA9, o: clamp(pA9 * 3), r: -1 });
-
-    const pVer = tw(t, E.sysVer, 0.26, ease.outBack);
-    UI.put(G.sysVer, { s: pVer, o: clamp(pVer * 3) });
   } else {
-    const jp = tw(t, E.judge + 0.1, 0.32, ease.outBack);
+    const jp = tw(t, E.judge + 0.08, 0.32, ease.outBack);
     UI.put($("jcA"), { y: (1 - jp) * -80, s: jp, o: clamp(jp * 3) });
     UI.put($("jcB"), { y: (1 - jp) * -80, s: jp, o: clamp(jp * 3) });
 
-    const pSJ = tw(t, E.judge + 0.15, 0.28, ease.outBack);
-    UI.put(G.sysJudge, { s: pSJ, o: clamp(pSJ * 3) });
+    UI.putNotice(G.sysJudge, t, E.judge + 0.12);
 
     const bob = Math.sin(onTwos(t) * 5) * 5;
     UI.put(G.aWin, { y: bob });
     const wobble = Math.sin(onTwos(t) * 8) * 4;
     UI.put(G.bDizzy, { r: wobble, y: Math.abs(wobble) * 2 });
 
-    const pB10 = tw(t, S.S10.start + 0.2, 0.28, ease.outBack);
-    UI.put(G.bB10, { s: pB10, o: clamp(pB10 * 3), r: 1 });
+    // 黄色【啥子】符纸从天而降啪地贴在 B 脑门上，随 B 晃脑微微摆动
+    const pTal = tw(t, E.talisman, 0.22, ease.outBack);
+    const talSwing = t >= E.talisman ? Math.sin((t - E.talisman) * 14) * Math.exp(-(t - E.talisman) * 1.2) * 14 : 0;
+    UI.put(G.talisman, {
+      x: 18,
+      y: -32 + (1 - pTal) * -140 + Math.abs(wobble) * 2,
+      s: lerp(2.2, 0.68, pTal),
+      r: 8 + wobble + talSwing,
+      o: clamp(pTal * 4),
+    });
 
-    const pSz = tw(t, E.shazi, 0.22, ease.outBack);
-    UI.put($("shazi-tag"), { s: lerp(2.4, 1, pSz), r: 8, o: clamp(pSz * 4) });
+    const pB10 = tw(t, S.S10.start + 0.15, 0.28, ease.outBack);
+    UI.put(G.bB10, { s: pB10, o: clamp(pB10 * 3), r: 1 });
   }
 
   $("flash").style.opacity = Math.max(
     kf(t, [[T0, 0.7], [T0 + 0.18, 0]]),
+    kf(t, [[E.rejSlam - 0.01, 0], [E.rejSlam + 0.03, 0.65], [E.rejSlam + 0.18, 0]]),
     kf(t, [[E.judge - 0.01, 0], [E.judge + 0.04, 0.75], [E.judge + 0.2, 0]]),
-    kf(t, [[E.shazi - 0.01, 0], [E.shazi, 0.65], [E.shazi + 0.14, 0]])
+    kf(t, [[E.talisman - 0.01, 0], [E.talisman, 0.75], [E.talisman + 0.16, 0]])
   );
 }
 

@@ -2,20 +2,31 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>01-hook · 哈基米A自吹 → 看见系统通知召唤B → 站立哈气对峙</title>
+<title>01-hook · 橘座自恋扫代码 → 同模分裂警报弹窗 → 狸花雷达对峙 → 嘶哈！！</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
   #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
-  .slash { position: absolute; left: 50%; top: -100px; width: 2px; height: 1280px;
-    background: linear-gradient(180deg, transparent, #fff 22%, #a78bfa 50%, #fff 78%, transparent);
-    transform: translateX(-50%) rotate(-9deg); box-shadow: 0 0 32px #a78bfa, 0 0 70px rgba(167,139,250,0.65); z-index: 30; }
+  .slash { position: absolute; left: 50%; top: -100px; width: 3px; height: 1280px;
+    background: linear-gradient(180deg, transparent, #fff 20%, #a855f7 50%, #fff 80%, transparent);
+    transform: translateX(-50%) rotate(-9deg); box-shadow: 0 0 36px #a855f7, 0 0 80px rgba(168,85,247,0.75); z-index: 30; }
 
-  #title-bar { position: absolute; left: 50%; top: 430px; width: 920px; margin-left: -460px; padding: 22px 36px;
-    background: rgba(9, 11, 22, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.22);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.85), 0 0 50px rgba(167,139,250,0.35); text-align: center; z-index: 200;
-    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
-  #title-bar .zh { font-family: "SerifSC"; font-weight: 900; font-size: 76px; letter-spacing: 6px; color: #fff; }
-  #title-bar .en { font-family: "Mono"; font-weight: 800; font-size: 18px; letter-spacing: 8px; color: #c4b5fd; margin-top: 6px; }
+  /* S01 背景发光代码墙 */
+  #code-bg { position: absolute; right: 90px; top: 110px; width: 820px; height: 720px;
+    background: rgba(11, 14, 28, 0.72); border: 1px solid rgba(255,158,110,0.28);
+    padding: 28px 34px; font-family: "Mono"; font-size: 20px; line-height: 1.75; color: rgba(210,220,255,0.65); z-index: 8; }
+  .claw-line { position: absolute; left: 20px; right: 20px; top: 218px; height: 42px;
+    background: linear-gradient(90deg, rgba(255,148,92,0.38), rgba(255,92,158,0.18), transparent);
+    border-left: 4px solid #ff945c; box-shadow: 0 0 28px rgba(255,148,92,0.45); }
+
+  /* S03 计分板归零胶囊 */
+  #zero-board { position: absolute; left: 50%; top: 292px; transform: translateX(-50%);
+    padding: 8px 28px; background: #090a14; border: 2px solid #a855f7;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.85), 0 0 24px rgba(168,85,247,0.45);
+    font-family: "Mono"; font-weight: 800; font-size: 22px; letter-spacing: 3px; color: #fff; z-index: 255; }
+  #zero-board .a { color: #ffb088; } #zero-board .b { color: #7cc4ff; }
+
+  /* B 身后的「边界越界 / 注入 / 泄漏」高亮雷达 */
+  #radar { position: absolute; right: 60px; top: 250px; width: 480px; height: 480px; z-index: 18; pointer-events: none; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -26,10 +37,24 @@
   <div id="root">
     <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
     <div class="grid"></div>
-    <div class="bg-type" id="bgT1" style="left:40px;top:90px">OVERCONFIDENT</div>
-    <div class="bg-type" id="bgT2" style="right:40px;bottom:80px">ADVERSARIAL</div>
+    <div class="bg-type" id="bgT1" style="left:40px;top:90px">SOLO_SCAN</div>
+    <div class="bg-type" id="bgT2" style="right:40px;bottom:80px">MODEL_SPLIT</div>
+
+    <div id="code-bg">
+      <div>039 &nbsp; tok = req.headers.get("Authorization")</div>
+      <div>040 &nbsp; user = await auth.resolve_user(tok)</div>
+      <div>041 &nbsp; // claw mark: missing null &amp; lock guard</div>
+      <div style="color:#fff;font-weight:800">042 &nbsp; return session.bind(user.id, req.ip)</div>
+      <div>043 &nbsp; }</div>
+      <div>044 &nbsp; async function deductStock(itemId, qty) {</div>
+      <div>045 &nbsp; &nbsp; const cur = await redis.get(itemId);</div>
+      <div>046 &nbsp; &nbsp; if (cur &gt;= qty) await redis.set(itemId, cur - qty);</div>
+      <div class="claw-line" id="claw"></div>
+    </div>
+
+    <canvas id="radar" width="480" height="480"></canvas>
     <div class="slash" id="slash"></div>
-    <div id="title-bar"><div class="zh">哈基米哈气审查</div><div class="en">HAKIMI HISS DUEL // ADVERSARIAL SUB-AGENT REVIEW</div></div>
+    <div id="zero-board">SCOREBOARD // <span class="a">A (橘座): 0</span> &nbsp;|&nbsp; <span class="b">B (狸花): 0</span></div>
   </div>
   <div class="vignette"></div>
   <div class="flash" id="flash"></div>
@@ -41,14 +66,13 @@ const A = "../../assets/chars/cut/";
 const S = {}; ["S01", "S02", "S03", "S04", "S05"].forEach((id) => (S[id] = K.seg(id)));
 
 const T = {
-  b1: S.S01.start + 0.2,
-  b2: S.S01.start + 2.7,
-  rule1: S.S02.start - 0.35,   // 系统通知先叮一声弹出，A 看到后开口念 S02
-  split: S.S02.start + 1.5,    // B 随系统通知召唤进场
-  b3: S.S02.start + 0.2,
+  b1: S.S01.start + 0.15,
+  b2: S.S01.start + 3.2,
+  alert: S.S02.start - 0.35,   // 警报红光一闪 + 同模分裂系统通知砸下
+  split: S.S02.start + 0.25,   // 镜像裂缝裂开，B 跃出
+  b3: S.S02.start + 0.4,
   b4: S.S03.start,
-  hiss: S.S04.start,
-  title: S.S04.end + 0.12,
+  hiss: S.S04.start,           // 嘶哈——！！ + 【ROUND1_HUNTING】弹窗
 };
 window.SHOT = { start: 0, end: +(S.S05.start - 0.1).toFixed(3) };
 
@@ -56,72 +80,125 @@ let G = {};
 window.__ready = (async () => {
   await document.fonts.load('900 80px "SerifSC"');
   await document.fonts.load('900 32px "SansSC"');
-  await document.fonts.load('700 16px "Mono"');
-  const im = await K.loadImages({ proud: A + "pose01.png", hissR: A + "pose02.png", hissL: A + "pose03.png" });
+  await document.fonts.load('800 16px "Mono"');
+  const im = await K.loadImages({ inspect: A + "pose04.png", proud: A + "pose01.png", hissR: A + "pose02.png", hissL: A + "pose03.png" });
   build(im);
   await document.fonts.ready;
 })();
 
 function build(im) {
   const root = $("root");
-  UI.hud(root, { left: "AGENT_A · 橘座 // POV: 1ST-PERSON", mid: "HAKIMI-HISS-CHANNEL · SESSION #01", right: "AGENT_B · 狸花" });
+  UI.hud(root, { left: "哈基米A (橘座 · 逻辑并发)", mid: "MODEL: INHERIT · HAKIMI-HISS-CHANNEL", right: "哈基米B (狸花 · 边界安全)" });
 
-  G.proud = UI.char(root, im.proud, { x: 640, y: 1380, h: 1340, cls: "glow-a" });
-  G.bProud1 = UI.polyBubble(root, {
-    x: 980, y: 130, w: 620, h: 195, who: "GEMINI_A // SELF-ASSESSMENT", theme: "a", tailDir: "left",
-    zh: '讲真，我的观察力<span class="hl-a">实在太敏锐了！</span>', en: "HONESTLY, MY EYE IS RAZOR-SHARP!",
-  });
-  G.bProud2 = UI.polyBubble(root, {
-    x: 1080, y: 360, w: 660, h: 205, who: "GEMINI_A // CONFIDENCE: 99.9%", theme: "a", tailDir: "left", spiky: true,
-    zh: '扫一眼代码，<span class="hl-a">直接把病根切出来！</span>', en: "ONE GLANCE AND I CUT THE ROOT CAUSE RIGHT OUT!",
-  });
-  G.bCrowd1 = UI.polyBubble(root, {
-    x: 90, y: 420, w: 300, h: 130, who: "USER_LOG", theme: "v", tailDir: "right",
-    zh: '<span style="font-size:24px">哇—Argon 好厉害！</span>', en: "SO IMPRESSIVE...",
-  });
+  // S01：A 眼神犀利扫视屏幕代码（先 inspect 指代码，说到“根本不需要帮手”切 proud）
+  G.aScan = UI.char(root, im.inspect, { x: 520, y: 1320, h: 1220, cls: "glow-a" });
+  G.aProud = UI.char(root, im.proud, { x: 540, y: 1340, h: 1260, cls: "glow-a" });
 
-  // 系统规则通知 1（A 与 B 都能看见并当场念出来）
-  G.rule1 = UI.sysNotice(root, {
-    x: 560, y: 92, w: 800, code: "SYSTEM NOTICE // RULE 01: DUAL-AGENT HISS REVIEW", badge: "ENFORCED",
-    zh: "【开启双子哈气对抗审查】已用同模型召唤哈基米B · 第一局抓虫多者获【一胜】",
-    en: "Spawning identical Gemini Subagent B · Round 1 Rule: Most valid bugs takes [Round 1 Win]",
+  G.bS01a = UI.polyBubble(root, {
+    x: 880, y: 130, w: 680, h: 185, who: "哈基米A (橘座) // RAZOR-SHARP EYE", theme: "a", tailDir: "left",
+    zh: '以本喵的眼神，扫一眼代码<br>就能把<span class="hl-a">病根直接刨出来！</span>',
+    en: "ONE GLANCE DIGS THE ROOT CAUSE RIGHT OUT!",
+  });
+  G.bS01b = UI.polyBubble(root, {
+    x: 980, y: 350, w: 620, h: 175, who: "哈基米A (橘座) // SOLO HUNTER", theme: "a", tailDir: "left", spiky: true,
+    zh: '<span class="hl-a">根本不需要帮手！</span>',
+    en: "I DON'T NEED ANY HELP!",
   });
 
-  G.L = UI.char(root, im.hissR, { x: 450, y: 1250, h: 1080, cls: "glow-a" });
-  G.R = UI.char(root, im.hissL, { x: 1470, y: 1250, h: 1080, cls: "glow-b" });
-
-  G.bWait = UI.polyBubble(root, {
-    x: 410, y: 265, w: 560, h: 190, who: "GEMINI_A // READING SYSTEM NOTICE", theme: "a", tailDir: "bottom-left",
-    zh: '这系统通知写的啥……「双子哈气审查」？！<br>对面那只怎么<span class="hl-a">跟本喵一模一样？！</span>',
-    en: "'DUAL HISS REVIEW'?! WHY DOES SHE LOOK JUST LIKE ME?!",
-  });
-  G.bTaunt = UI.polyBubble(root, {
-    x: 960, y: 290, w: 560, h: 190, who: "GEMINI_B // READING SYSTEM NOTICE", theme: "b", tailDir: "bottom-right", spiky: true,
-    zh: '本喵也收到通知了！抓虫多的拿<span class="hl-b">【一胜】</span>——<br>这库的虫子全归我！',
-    en: "GOT THE NOTICE TOO! MOST BUGS TAKES ROUND 1—ALL MINE!",
+  // S02 系统通知弹窗（高存在感模态框）
+  G.sysSplit = UI.sysNotice(root, {
+    x: 470, y: 84, w: 980,
+    code: "SYSTEM ALERT // MODEL: INHERIT SPLIT", badge: "【一胜】争夺开启",
+    tag: "【哈基米哈气审查开启】",
+    zh: "<b>Model: inherit 同模分裂！</b>哈基米A（橘座·逻辑并发）VS 哈基米B（狸花·边界安全）· 第一局抓虫多者夺<b>【一胜】</b>",
+    en: "Same session model cloned -> Subagent A (Logic/Concurrency) vs Subagent B (Boundary/Security)",
   });
 
-  G.sfxL = UI.sfxSerif(root, { x: 86, y: 110, zh: "哈——！", sub: "HISS // SUBAGENT_A", subColor: "#ff8ec7", align: "left" });
-  G.sfxR = UI.sfxSerif(root, { x: 1330, y: 110, zh: "哈——！", sub: "HISS // SUBAGENT_B", subColor: "#7cc4ff", align: "right" });
+  // S04 系统通知弹窗
+  G.sysReady = UI.sysNotice(root, {
+    x: 520, y: 430, w: 880, kind: "gold",
+    code: "CHANNEL ONLINE // ROUND1_HUNTING", badge: "READY",
+    tag: "【ROUND1_HUNTING】",
+    zh: "防重通道 <b>hakimi-hiss-channel</b> 已就绪 · 实时拦截 ±5 行重复提报！",
+    en: "Zero-dependency Stdio MCP channel armed · Real-time duplicate shield active",
+  });
+
+  // S02–S04 双猫对峙
+  G.L = UI.char(root, im.hissR, { x: 430, y: 1250, h: 1060, cls: "glow-a" });
+  G.R = UI.char(root, im.hissL, { x: 1490, y: 1250, h: 1060, cls: "glow-b" });
+
+  G.bS02 = UI.polyBubble(root, {
+    x: 340, y: 340, w: 600, h: 190, who: "哈基米A (橘座) // TURF INVADED?!", theme: "a", tailDir: "bottom-left", spiky: true,
+    zh: '铲屎官用同个模型又捏了一只猫？！<br>对面那只臭狸花，<span class="hl-a">谁准你抢本喵猎场的？！</span>',
+    en: "SPAWNED ANOTHER CAT FROM MY MODEL?! WHO LET YOU ON MY TURF?!",
+  });
+  G.bS03 = UI.polyBubble(root, {
+    x: 960, y: 360, w: 620, h: 195, who: "哈基米B (狸花) // BOUNDARY RADAR LOCKED", theme: "b", tailDir: "bottom-right", spiky: true,
+    zh: '只盯主干逻辑的胖橘少自恋了！<br>死角和边界全归本喵——<span class="hl-b">这局「一胜」我拿定了！</span>',
+    en: "CORNER CASES & BOUNDARIES ARE MINE—ROUND ONE IS LOCKED IN!",
+  });
+
+  G.sfxL = UI.sfxSerif(root, { x: 80, y: 120, zh: "嘶哈——!!", sub: "HISS // 橘座 · LOGIC_CLAW", subColor: "#ffb088", align: "left" });
+  G.sfxR = UI.sfxSerif(root, { x: 1240, y: 120, zh: "嘶哈——!!", sub: "HISS // 狸花 · SEC_FANG", subColor: "#7cc4ff", align: "right" });
+}
+
+function drawRadar(t) {
+  const c = $("radar").getContext("2d");
+  c.clearRect(0, 0, 480, 480);
+  const p = tw(t, S.S03.start - 0.1, 0.35, ease.outCubic) * (1 - tw(t, T.hiss, 0.18));
+  if (p <= 0.01) return;
+  c.save();
+  c.globalAlpha = p;
+  const cx = 240, cy = 240;
+  c.strokeStyle = "rgba(110, 184, 255, 0.45)";
+  c.lineWidth = 1.8;
+  [90, 155, 215].forEach((r) => { c.beginPath(); c.arc(cx, cy, r, 0, Math.PI * 2); c.stroke(); });
+  // 扫描扇形
+  const ang = t * 2.8;
+  const g = c.createRadialGradient(cx, cy, 10, cx, cy, 215);
+  g.addColorStop(0, "rgba(110, 184, 255, 0.32)"); g.addColorStop(1, "rgba(110, 184, 255, 0.0)");
+  c.fillStyle = g;
+  c.beginPath(); c.moveTo(cx, cy); c.arc(cx, cy, 215, ang, ang + 0.85); c.closePath(); c.fill();
+  // 三个高亮靶点标签：边界越界 / 注入 / 泄漏
+  c.font = '800 16px "SansSC"';
+  [[90, 95, "◈ 边界越界 BOUNDARY"], [290, 120, "◈ 注入 SQL/CMD"], [270, 360, "◈ 资源泄漏 LEAK"]].forEach(([x, y, txt]) => {
+    c.fillStyle = "rgba(9, 12, 24, 0.88)"; c.strokeStyle = "#7cc4ff"; c.lineWidth = 1.5;
+    c.fillRect(x - 8, y - 20, 178, 28); c.strokeRect(x - 8, y - 20, 178, 28);
+    c.fillStyle = "#bae6fd"; c.fillText(txt, x, y);
+  });
+  c.restore();
 }
 
 function drawBg(t, inSplit, hitHiss) {
   const c = $("bg").getContext("2d");
   c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
+
+  // S02 警报红光一闪
+  const redAlert = kf(t, [[T.alert - 0.02, 0], [T.alert + 0.06, 0.55], [T.alert + 0.45, 0]]);
+  if (redAlert > 0) {
+    c.fillStyle = `rgba(255, 30, 70, ${redAlert})`;
+    c.fillRect(0, 0, 1920, 1080);
+  }
+
   if (!inSplit) {
-    const g = c.createRadialGradient(640, 480, 40, 640, 480, 760);
-    g.addColorStop(0, "rgba(255, 110, 184, 0.24)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    const g = c.createRadialGradient(540, 480, 40, 540, 480, 760);
+    g.addColorStop(0, "rgba(255, 140, 80, 0.24)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
     c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   } else {
-    let g = c.createRadialGradient(450, 520, 30, 450, 520, 720);
-    g.addColorStop(0, hitHiss ? "rgba(255, 96, 176, 0.34)" : "rgba(255, 96, 176, 0.18)");
+    let g = c.createRadialGradient(430, 520, 30, 430, 520, 720);
+    g.addColorStop(0, hitHiss ? "rgba(255, 130, 70, 0.36)" : "rgba(255, 130, 70, 0.20)");
     g.addColorStop(1, "rgba(7, 8, 17, 0)"); c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
-    g = c.createRadialGradient(1470, 520, 30, 1470, 520, 720);
-    g.addColorStop(0, hitHiss ? "rgba(86, 172, 255, 0.34)" : "rgba(86, 172, 255, 0.18)");
+    g = c.createRadialGradient(1490, 520, 30, 1490, 520, 720);
+    g.addColorStop(0, hitHiss ? "rgba(86, 172, 255, 0.36)" : "rgba(86, 172, 255, 0.20)");
     g.addColorStop(1, "rgba(7, 8, 17, 0)"); c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   }
+
+  // S04 电流与火花在屏幕中央对撞
   if (hitHiss) {
-    K.focusLines(c, 1920, 1080, 960, 520, 480, 120, t, { color: "rgba(255,255,255,0.12)", alpha: 1, seed: 5 });
+    K.focusLines(c, 1920, 1080, 960, 520, 440, 130, t, { color: "rgba(255,255,255,0.15)", alpha: 1, seed: 5 });
+    const seed = 17 + Math.floor((t - T.hiss) * 12);
+    K.drawBolt(c, K.boltPath(1010, -20, 910, 1100, 10, 65, seed), 26, "#fde047", "#a855f7");
+    K.drawBolt(c, K.boltPath(910, 80, 1010, 960, 8, 45, seed + 7), 14, "#7cc4ff", "#ff7ab8");
   }
 }
 
@@ -129,56 +206,64 @@ function render(t) {
   const inSplit = t >= T.split;
   const hitHiss = t >= T.hiss;
   drawBg(t, inSplit, hitHiss);
+  drawRadar(t);
 
-  const [sx, sy] = shake(t, T.hiss, 0.55, 22);
-  const [sx2, sy2] = shake(t, T.rule1, 0.22, 8);
+  const [sx, sy] = shake(t, T.hiss, 0.55, 24);
+  const [sx2, sy2] = shake(t, T.alert, 0.30, 14);
   $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
-  $("bgT1").style.opacity = inSplit ? 0.25 : 1;
+  $("bgT1").style.opacity = inSplit ? 0.2 : 1;
   $("bgT2").style.opacity = inSplit ? 1 : 0;
 
-  const p1Out = tw(t, T.split - 0.12, 0.22);
-  const breath = Math.sin(t * 2.8) * 0.008;
-  const laugh = t < S.S01.end ? Math.abs(Math.sin(onTwos(t) * 9)) * -9 : 0;
-  UI.put(G.proud, { y: laugh, sy: 1 + breath, sx: 1 - breath * 0.5, o: 1 - p1Out });
+  // S01：A 扫视代码 → 爪尖划亮第 42 行 → 抬头得意
+  const p1Out = tw(t, T.alert, 0.22);
+  $("code-bg").style.opacity = 1 - p1Out;
+  $("claw").style.transform = `scaleX(${tw(t, 0.9, 0.45, ease.outCubic)})`;
+  $("claw").style.transformOrigin = "0 50%";
 
-  const hideB12 = tw(t, T.rule1, 0.2);
-  const pb1 = tw(t, T.b1, 0.3, ease.outBack) * (1 - hideB12);
-  const pb2 = tw(t, T.b2, 0.3, ease.outBack) * (1 - hideB12);
-  const pc1 = tw(t, T.b1 + 0.6, 0.3, ease.outBack) * (1 - hideB12);
-  UI.put(G.bProud1, { s: pb1, o: clamp(pb1 * 3), r: -1.5 });
-  UI.put(G.bProud2, { s: pb2, o: clamp(pb2 * 3), r: 1.2 });
-  UI.put(G.bCrowd1, { s: pc1, o: clamp(pc1 * 3), r: -2 });
+  const toProud = t >= T.b2 - 0.15;
+  const bob = Math.sin(onTwos(t) * 5) * 5;
+  UI.put(G.aScan, { y: bob, o: (toProud ? 0 : 1) * (1 - p1Out) });
+  UI.put(G.aProud, { y: bob, s: toProud ? tw(t, T.b2 - 0.15, 0.25, ease.outBack) : 0, o: (toProud ? 1 : 0) * (1 - p1Out) });
 
-  const pr1 = tw(t, T.rule1, 0.28, ease.outBack);
-  UI.put(G.rule1, { y: (1 - pr1) * -40, s: pr1, o: clamp(pr1 * 3) });
+  const pb1 = tw(t, T.b1, 0.28, ease.outBack) * (1 - p1Out);
+  const pb2 = tw(t, T.b2, 0.28, ease.outBack) * (1 - p1Out);
+  UI.put(G.bS01a, { s: pb1, o: clamp(pb1 * 3), r: -1.2 });
+  UI.put(G.bS01b, { s: pb2, o: clamp(pb2 * 3), r: 1.2 });
 
-  $("slash").style.opacity = tw(t, T.split, 0.25, ease.outCubic);
+  // S02 系统通知弹窗（强存在感砸下）
+  UI.putNotice(G.sysSplit, t, T.alert, { outT: T.hiss - 0.15 });
 
-  const pL = tw(t, T.split, 0.32, ease.outCubic);
-  const pR = tw(t, T.split + 0.08, 0.35, ease.outBack);
-  const lunge = tw(t, T.hiss, 0.18, ease.outCubic) * 48 - tw(t, T.hiss + 0.25, 0.6, ease.inOutSine) * 18;
-  const hissVib = hitHiss && t < T.hiss + 0.5 ? 1 + 0.035 * Math.sin(onTwos(t, 30) * 40) : 1;
-  UI.put(G.L, { x: (1 - pL) * -240 + lunge, sy: hissVib, o: pL });
-  UI.put(G.R, { x: (1 - pR) * 240 - lunge, s: pR, sy: hissVib, o: clamp(pR * 3) });
+  // S03 计分板归零 A: 0 | B: 0
+  const pZero = tw(t, S.S03.start - 0.1, 0.28, ease.outBack) * (1 - tw(t, T.hiss - 0.15, 0.2));
+  $("zero-board").style.opacity = clamp(pZero * 3);
+  $("zero-board").style.transform = `translateX(-50%) scale(${pZero})`;
 
-  const hideWait = tw(t, T.hiss - 0.1, 0.18);
-  const pw = tw(t, T.b3, 0.28, ease.outBack) * (1 - hideWait);
-  const pt = tw(t, T.b4, 0.28, ease.outBack) * (1 - hideWait);
-  UI.put(G.bWait, { s: pw, o: clamp(pw * 3), r: -1.2 });
-  UI.put(G.bTaunt, { s: pt, o: clamp(pt * 3), r: 1.2 });
+  // 双猫镜像裂缝对峙
+  $("slash").style.opacity = tw(t, T.split, 0.22, ease.outCubic);
+  const pL = tw(t, T.split, 0.30, ease.outCubic);
+  const pR = tw(t, T.split + 0.06, 0.32, ease.outBack);
+  const lunge = tw(t, T.hiss, 0.16, ease.outCubic) * 54 - tw(t, T.hiss + 0.25, 0.55, ease.inOutSine) * 18;
+  const hissVib = hitHiss && t < T.hiss + 0.55 ? 1 + 0.04 * Math.sin(onTwos(t, 30) * 42) : 1;
+  UI.put(G.L, { x: (1 - pL) * -260 + lunge, sy: hissVib, o: pL });
+  UI.put(G.R, { x: (1 - pR) * 260 - lunge, s: pR, sy: hissVib, o: clamp(pR * 3) });
 
+  const hideBub = tw(t, T.hiss - 0.08, 0.18);
+  const pB3 = tw(t, T.b3, 0.26, ease.outBack) * (1 - hideBub);
+  const pB4 = tw(t, T.b4, 0.26, ease.outBack) * (1 - hideBub);
+  UI.put(G.bS02, { s: pB3, o: clamp(pB3 * 3), r: -1.2 });
+  UI.put(G.bS03, { s: pB4, o: clamp(pB4 * 3), r: 1.2 });
+
+  // S04：嘶哈——！！ + 【ROUND1_HUNTING】弹窗
   ["sfxL", "sfxR"].forEach((k, i) => {
-    const p = tw(t, T.hiss + i * 0.05, 0.22, ease.outBack);
-    UI.put(G[k], { s: lerp(2.2, 1, p), o: clamp(p * 3), r: i ? 4 : -4 });
+    const p = tw(t, T.hiss + i * 0.04, 0.20, ease.outBack);
+    UI.put(G[k], { s: lerp(2.3, 1, p), o: clamp(p * 3), r: i ? 4 : -4 });
   });
-
-  const pTitle = tw(t, T.title, 0.32, ease.outBack);
-  UI.put($("title-bar"), { s: pTitle, o: clamp(pTitle * 3) });
+  UI.putNotice(G.sysReady, t, T.hiss + 0.18, { yFrom: 40 });
 
   $("flash").style.opacity = Math.max(
-    kf(t, [[T.split - 0.01, 0], [T.split, 0.55], [T.split + 0.14, 0]]),
-    kf(t, [[T.hiss - 0.01, 0], [T.hiss, 0.85], [T.hiss + 0.15, 0]])
+    kf(t, [[T.alert - 0.01, 0], [T.alert, 0.65], [T.alert + 0.14, 0]]),
+    kf(t, [[T.hiss - 0.01, 0], [T.hiss, 0.90], [T.hiss + 0.16, 0]])
   );
 }
 

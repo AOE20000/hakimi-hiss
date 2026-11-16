@@ -1,8 +1,7 @@
-"""全片混音 v2：无旁白双猫对白 + 系统通知提示音（sfx_sys_chime）+ 稀疏视觉事件音效 + MusicGen BGM 自动侧链让路 + −16 LUFS 母带。"""
+"""全片混音 v3：精准对齐 12 镜台词时间轴 + 强存在感系统弹窗提示音 + 双声道猫哈气金属交击 + 防重护盾反弹音 + 搞笑敲锣声 + MusicGen BGM 自动侧链让路 + −16 LUFS 母带。"""
 import json
 import pathlib
 import subprocess
-import sys
 
 import numpy as np
 import soundfile as sf
@@ -20,15 +19,17 @@ def env_ad(n, a=0.005, p=2.0):
     return e
 
 
-def sfx_sys_chime(f0=987.77, f1=1479.98, dur=0.36, amp=0.24):
-    """系统规则通知弹出提示音：清脆双音玻璃提示（B5 → F#6）。"""
+def sfx_sys_chime(f0=987.77, f1=1479.98, dur=0.36, amp=0.28):
+    """强存在感系统规则弹窗音效：机械冲击底鼓 + 双音战术高频脉冲。"""
     n = int(dur * SR); out = np.zeros((n, 2))
     for t0, f, d in [(0.0, f0, 0.14), (0.065, f1, dur - 0.065)]:
         i0 = int(t0 * SR); m = min(int(d * SR), n - i0)
         t = np.arange(m) / SR
-        w = (np.sin(2 * np.pi * f * t) + 0.3 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 14)) * np.exp(-t * 6.5)
+        w = (np.sin(2 * np.pi * f * t) + 0.35 * np.sin(2 * np.pi * f * 2 * t) * np.exp(-t * 12)) * np.exp(-t * 6.0)
         w[:int(0.003 * SR)] *= np.linspace(0, 1, int(0.003 * SR))
         out[i0:i0 + m, 0] += w; out[i0:i0 + m, 1] += w
+    thud = np.sin(2 * np.pi * np.cumsum(np.linspace(150, 45, n)) / SR) * env_ad(n, 0.002, 4.0) * 0.55
+    out[:, 0] += thud; out[:, 1] += thud
     return out * amp
 
 
@@ -39,7 +40,8 @@ def sfx_pop(f0=520, f1=880, dur=0.08, amp=0.22):
     return np.stack([w, w], 1)
 
 
-def sfx_hiss_clash(dur=0.65, amp=0.45):
+def sfx_hiss_clash(dur=0.72, amp=0.48):
+    """双声道立体声猫哈气 + 金属利爪交击声（S04 & S12）。"""
     n = int(dur * SR)
     rng = np.random.default_rng(19)
     b, a = butter(3, [2600 / (SR / 2), 9500 / (SR / 2)], btype="band")
@@ -47,12 +49,14 @@ def sfx_hiss_clash(dur=0.65, amp=0.45):
     mod = 0.75 + 0.25 * np.sin(2 * np.pi * 28 * t)
     hL = lfilter(b, a, rng.standard_normal(n)) * env_ad(n, 0.015, 1.4) * mod
     hR = lfilter(b, a, rng.standard_normal(n)) * env_ad(n, 0.03, 1.4) * mod
-    boom = np.sin(2 * np.pi * np.cumsum(np.linspace(140, 36, n)) / SR) * env_ad(n, 0.002, 2.8) * 1.1
-    m = int(0.08 * SR)
-    zap = np.sign(np.sin(2 * np.pi * np.cumsum(np.linspace(2200, 420, m)) / SR)) * env_ad(m, 0.001, 2.0) * 0.45
-    zpad = np.zeros(n); zpad[:m] = zap
-    L = (hL * 0.65 + boom * 0.7 + zpad) * amp
-    R = (hR * 0.65 + boom * 0.7 + zpad) * amp
+    boom = np.sin(2 * np.pi * np.cumsum(np.linspace(140, 36, n)) / SR) * env_ad(n, 0.002, 2.8) * 1.0
+    # 金属交击泛音簇（非谐波高频铃音）
+    metal = np.zeros(n)
+    for mf, md in [(1840, 9.0), (2790, 11.0), (4120, 14.0), (5680, 18.0)]:
+        metal += np.sin(2 * np.pi * mf * t) * np.exp(-t * md) * 0.32
+    metal[:int(0.002 * SR)] *= np.linspace(0, 1, int(0.002 * SR))
+    L = (hL * 0.72 + boom * 0.65 + metal * 0.85) * amp
+    R = (hR * 0.72 + boom * 0.65 + metal * 0.85) * amp
     return np.stack([L, R], 1)
 
 
@@ -66,14 +70,26 @@ def sfx_stamp(dur=0.28, amp=0.42):
     return np.stack([w, w], 1)
 
 
-def sfx_buzzer(dur=0.34, amp=0.30):
+def sfx_shield_bounce(dur=0.42, amp=0.38):
+    """清脆防重护盾拦截音 DUPLICATE!（S06）。"""
+    n = int(dur * SR); t = np.arange(n) / SR
+    ping = (np.sin(2 * np.pi * 1320 * t) + 0.5 * np.sin(2 * np.pi * 1980 * t)) * np.exp(-t * 8.5)
+    boing = np.sin(2 * np.pi * np.cumsum(np.linspace(680, 260, n)) / SR) * env_ad(n, 0.003, 2.2) * 0.7
+    w = (ping * 0.75 + boing) * amp
+    st = np.stack([w, w], 1)
+    s = sfx_stamp(0.22, amp * 0.6)
+    st[:len(s)] += s
+    return st
+
+
+def sfx_buzzer(dur=0.34, amp=0.34):
     n = int(dur * SR); t = np.arange(n) / SR
     tone = (np.tanh(2.5 * np.sin(2 * np.pi * 185 * t)) + np.tanh(2.5 * np.sin(2 * np.pi * 262 * t))) * 0.4
     w = tone * env_ad(n, 0.004, 2.2) * amp
     return np.stack([w, w], 1) + sfx_stamp(dur, amp * 0.85)
 
 
-def sfx_fanfare(dur=1.0, amp=0.26):
+def sfx_fanfare(dur=1.0, amp=0.28):
     n = int(dur * SR); out = np.zeros((n, 2))
     seq = [(0.0, 587.33, 0.14), (0.13, 783.99, 0.14), (0.26, 1174.66, 0.70)]
     for t0, f, d in seq:
@@ -84,13 +100,21 @@ def sfx_fanfare(dur=1.0, amp=0.26):
     return out * amp
 
 
-def sfx_wah(dur=0.6, amp=0.32):
-    n = int(dur * SR)
-    ph = 2 * np.pi * np.cumsum(np.linspace(480, 145, n)) / SR
-    w = (np.sin(ph) + 0.4 * np.sin(2 * ph)) * env_ad(n, 0.004, 1.6) * amp
+def sfx_gong(dur=1.15, amp=0.44):
+    """搞笑戏曲敲锣 + 符纸啪贴音效（S10 【啥子】符纸贴脑门）。"""
+    n = int(dur * SR); t = np.arange(n) / SR
+    rng = np.random.default_rng(77)
+    # 铜锣上滑音与非谐波金属泛音
+    glide = np.cumsum(np.linspace(195, 235, n)) / SR
+    gong = np.sin(2 * np.pi * glide) * 0.55
+    for ratio, dec in [(1.41, 3.2), (1.73, 4.0), (2.28, 5.2), (2.93, 6.5), (3.65, 8.0)]:
+        gong += np.sin(2 * np.pi * glide * ratio + 0.4 * np.sin(2 * np.pi * 18 * t)) * np.exp(-t * dec) * 0.25
+    b, a = butter(2, [800 / (SR / 2), 6500 / (SR / 2)], btype="band")
+    shimmer = lfilter(b, a, rng.standard_normal(n)) * env_ad(n, 0.008, 2.8) * 0.35
+    w = (gong * env_ad(n, 0.003, 1.5) + shimmer) * amp
     st = np.stack([w, w], 1)
-    s = sfx_stamp(0.28, amp)
-    st[:len(s)] += s
+    slap = sfx_stamp(0.24, amp * 0.85)
+    st[:len(slap)] += slap
     return st
 
 
@@ -116,32 +140,36 @@ def build_mix(out_wav, end_t=None):
 
     sfx = np.zeros((N, 2), np.float32)
     hiss = S["S04"]["start"]
-    shazi = S["S10"]["start"] + 2.2
+    talisman_hit = S["S10"]["start"] + 1.1
 
-    # ── 01-hook ──
-    place(sfx, S["S01"]["start"] + 0.2, sfx_pop(520, 880), -4)          # 自吹气泡 1
-    place(sfx, S["S01"]["start"] + 2.7, sfx_pop(600, 980), -4)          # 自吹气泡 2
-    place(sfx, S["S02"]["start"] - 0.35, sfx_sys_chime(988, 1480), 0)   # 系统通知 01：开启双子哈气对抗审查
-    place(sfx, S["S02"]["start"] + 1.5, sfx_stamp(0.24, 0.32), -2)      # 斜切分屏 & B 进场
-    place(sfx, hiss, sfx_hiss_clash(), +1)                              # 哈——!!
-    place(sfx, S["S04"]["end"] + 0.12, sfx_sys_chime(784, 1568), -1)    # 片名条弹出
+    # ── 01-hook (S01 - S04) ──
+    place(sfx, S["S01"]["start"] + 0.15, sfx_pop(520, 880), -3)           # S01 橘座出场气泡
+    place(sfx, S["S01"]["start"] + 1.10, sfx_pop(900, 1400), -3)          # 爪尖划过代码行
+    place(sfx, S["S02"]["start"] - 0.25, sfx_sys_chime(988, 1480), +1)    # S02 警报红光 + 同模分裂系统弹窗
+    place(sfx, S["S02"]["start"] + 0.05, sfx_stamp(0.24, 0.34), -1)       # 镜像裂缝炸毛跃出
+    place(sfx, S["S03"]["start"] + 0.10, sfx_sys_chime(1174, 1568), -2)   # S03 边界安全雷达展开
+    place(sfx, hiss - 0.10, sfx_sys_chime(880, 1760), -1)                 # S04 ROUND1_HUNTING 弹窗
+    place(sfx, hiss, sfx_hiss_clash(), +1.5)                              # S04 双声道猫哈气 + 金属交击
 
     if end_t > 24:
-        # ── 02-round1 ──
-        place(sfx, S["S05"]["start"] + 1.2, sfx_pop(540, 840), -4)      # BUG-001 登记
-        place(sfx, S["S06"]["start"] + 1.8, sfx_buzzer(), 0)            # 系统通知 02：防重拦截（红）
-        place(sfx, S["S07"]["start"] + 1.0, sfx_fanfare(), -1)          # 系统通知：第一局【一胜】
+        # ── 02-round1 (S05 - S07) ──
+        place(sfx, S["S05"]["start"] + 0.20, sfx_sys_chime(1046, 1568), 0)  # S05 BUG-001 抢注成功弹窗
+        place(sfx, S["S06"]["start"] + 1.15, sfx_shield_bounce(), +1)       # S06 红色防重护盾反弹 DUPLICATE!
+        place(sfx, S["S07"]["start"] - 0.20, sfx_fanfare(), 0)              # S07 第一局结算【一胜】金光
 
-        # ── 03-round2 ──
-        place(sfx, S["S08"]["start"] - 0.05, sfx_sys_chime(880, 1318), 0)   # 系统通知 03：隔离工作树交叉修复
-        place(sfx, S["S09"]["start"] - 0.2, sfx_sys_chime(1046, 784), 0)    # 系统通知 04：互哈互验打回
-        place(sfx, S["S09"]["start"] + 4.4, sfx_buzzer(), 0)                # 点驳回
-        place(sfx, S["S10"]["start"] - 0.25, sfx_fanfare(), -1)             # 系统通知 05：终审【二胜】
-        place(sfx, shazi, sfx_wah(), +1)                                    # 【啥子】贴标
+        # ── 03-round2 (S08 - S10) ──
+        place(sfx, S["S08"]["start"] - 0.05, sfx_sys_chime(880, 1318), 0)   # S08 双 Worktree 交叉修复弹窗
+        place(sfx, S["S08"]["start"] + 0.50, sfx_pop(640, 1120), -2)        # Bug 胶囊交叉飞向对方沙盒
+        place(sfx, S["S09"]["start"] - 0.15, sfx_sys_chime(1046, 784), 0)   # S09 REJECT_WITH_HISS 弹窗
+        place(sfx, S["S09"]["start"] + 1.80, sfx_buzzer(), +1)              # A 一爪拍下「驳回重修」印章
+        place(sfx, S["S10"]["start"] - 0.20, sfx_fanfare(), -1)             # S10 铲屎官终审金光 PERFECT
+        place(sfx, talisman_hit, sfx_gong(), +1.5)                          # S10 搞笑敲锣声 + 【啥子】符纸贴脑门
 
-        # ── 04-cta ──
-        place(sfx, S["S11"]["start"] + 0.1, sfx_sys_chime(988, 1480), -1)   # 系统通知 06：长期上下文保持
-        place(sfx, S["S12"]["end"] - 0.4, sfx_hiss_clash(0.45, 0.35), -1)   # 结尾再哈一声
+        # ── 04-cta (S11 - S12) ──
+        place(sfx, S["S11"]["start"] + 0.02, sfx_sys_chime(988, 1480), 0)   # S11 持久化 conv_id 灵魂锁链弹窗
+        place(sfx, S["S12"]["start"] + 0.95, sfx_pop(880, 440), -1)         # S12 撕起半截符纸啪地弹回
+        place(sfx, S["S12"]["start"] + 1.35, sfx_sys_chime(784, 1568), -1)  # S12 定格项目 Logo 与 Slogan 卡
+        place(sfx, S["S12"]["end"] - 0.85, sfx_hiss_clash(0.55, 0.42), +1)  # S12 结尾「嘶哈——！！」
 
     bgm_file = ROOT / "sound" / "music" / "m1_test.wav"
     bgm = np.zeros((N, 2), np.float32)
@@ -156,9 +184,9 @@ def build_mix(out_wav, end_t=None):
             loop = np.concatenate([loop[:-xf], a, m[xf:]], 0)
         bgm = loop[:N] / (np.max(np.abs(loop[:N])) + 1e-6) * 0.15
 
-        silences = [(hiss - 0.25, hiss + 0.55)]
+        silences = [(hiss - 0.20, hiss + 0.55)]
         if end_t > 24:
-            silences.append((shazi - 0.2, shazi + 0.5))
+            silences.append((talisman_hit - 0.15, talisman_hit + 0.55))
         f = int(0.08 * SR)
         for t0, t1 in silences:
             a, b = int(t0 * SR), min(N - f - 1, int(t1 * SR))

@@ -2,43 +2,46 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>02-round1 · 第一局：看见系统防重拦截弹窗与一胜通告</title>
+<title>02-round1 · 第一局：BUG-001 抢注弹窗 → 红色防重护盾弹开 B → SUSPENDED_ROUND1 结算弹窗</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
   #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
-  .code-win { position: absolute; top: 100px; width: 590px; height: 590px; background: rgba(11, 13, 24, 0.86);
+  .code-win { position: absolute; top: 92px; width: 580px; height: 560px; background: rgba(11, 13, 24, 0.86);
     backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.12);
     box-shadow: 0 24px 60px rgba(0,0,0,0.75); overflow: hidden; font-family: "Mono"; z-index: 12; }
-  .code-win .bar { height: 40px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
+  .code-win .bar { height: 38px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
     background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.10);
     font-size: 13px; letter-spacing: 1.5px; color: rgba(226,232,255,0.75); }
-  .code-win pre { margin: 0; padding: 18px 20px; font-size: 17px; line-height: 1.62; color: #c7d0f0; }
+  .code-win pre { margin: 0; padding: 16px 20px; font-size: 16.5px; line-height: 1.60; color: #c7d0f0; }
   .ln { color: #4c5375; margin-right: 14px; }
-  .kw { color: #ff7ab8; } .fn { color: #7cc4ff; } .str { color: #fde047; } .cm { color: #687096; }
-  .bug-hl { position: absolute; left: 10px; right: 10px; background: rgba(255, 77, 109, 0.18);
-    border-left: 3px solid #ff4d6d; border-right: 1px solid rgba(255,77,109,0.45); pointer-events: none; }
+  .kw { color: #ff9e6e; } .fn { color: #7cc4ff; } .str { color: #fde047; } .cm { color: #687096; }
+  .bug-hl { position: absolute; left: 10px; right: 10px; background: rgba(255, 138, 76, 0.20);
+    border-left: 3px solid #ff9e6e; border-right: 1px solid rgba(255,158,110,0.45); pointer-events: none; }
   .scan { position: absolute; left: 0; right: 0; height: 2px;
-    background: linear-gradient(90deg, transparent, #a78bfa, transparent); box-shadow: 0 0 12px #a78bfa; }
+    background: linear-gradient(90deg, transparent, #a855f7, transparent); box-shadow: 0 0 12px #a855f7; }
 
-  #chan { position: absolute; left: 660px; top: 100px; width: 600px; height: 590px; background: rgba(12, 14, 28, 0.92);
-    border: 1px solid rgba(167,139,250,0.35); box-shadow: 0 28px 70px rgba(0,0,0,0.8); z-index: 18; overflow: hidden; }
-  #chan .hdr { height: 52px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between;
-    background: rgba(167,139,250,0.10); border-bottom: 1px solid rgba(167,139,250,0.28);
-    font-family: "Mono"; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: #ddd6fe; }
-  .score { display: flex; justify-content: space-between; align-items: center; padding: 12px 36px;
+  #chan { position: absolute; left: 650px; top: 92px; width: 620px; height: 560px; background: rgba(12, 14, 28, 0.92);
+    border: 1.5px solid rgba(168,85,247,0.42); box-shadow: 0 28px 70px rgba(0,0,0,0.8); z-index: 18; overflow: hidden; }
+  #chan .hdr { height: 48px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(168,85,247,0.14); border-bottom: 1px solid rgba(168,85,247,0.32);
+    font-family: "Mono"; font-size: 13px; font-weight: 800; letter-spacing: 2px; color: #e9d5ff; }
+  .score { display: flex; justify-content: space-between; align-items: center; padding: 10px 36px;
     border-bottom: 1px solid rgba(255,255,255,0.10); font-family: "Mono"; }
-  .score .num { font-size: 46px; font-weight: 800; color: #fff; }
-  .score .num.a { color: #ff8ec7; text-shadow: 0 0 20px rgba(255,142,199,0.45); }
-  .score .num.b { color: #7cc4ff; text-shadow: 0 0 20px rgba(124,196,255,0.45); }
-  .score .lbl { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
+  .score .num { font-size: 46px; font-weight: 800; }
+  .score .num.a { color: #ffb088; text-shadow: 0 0 20px rgba(255,158,110,0.5); }
+  .score .num.b { color: #7cc4ff; text-shadow: 0 0 20px rgba(124,196,255,0.5); }
+  .score .lbl { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.55); }
 
-  .card { position: absolute; left: 22px; width: 556px; height: 84px; background: rgba(20, 23, 42, 0.92);
-    border: 1px solid rgba(255,255,255,0.12); border-left: 3px solid #ff7ab8; padding: 11px 18px;
+  .card { position: absolute; left: 22px; width: 576px; height: 78px; background: rgba(20, 23, 42, 0.92);
+    border: 1px solid rgba(255,255,255,0.12); border-left: 3px solid #ff9e6e; padding: 10px 18px;
     box-sizing: border-box; font-family: "Mono"; }
   .card.B { border-left-color: #6eb8ff; }
-  .card.dup { background: rgba(70, 14, 28, 0.92); border-color: #ff4d6d; border-left: 4px solid #ff4d6d; }
-  .card .top { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 1.5px; color: rgba(220,228,255,0.65); }
-  .card .ttl { font-family: "SansSC"; font-weight: 800; font-size: 20px; color: #f4f6ff; margin-top: 5px; }
+  .card.dup { background: rgba(88, 14, 32, 0.95); border: 2px solid #ff3b6b; }
+  .card .top { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 1.5px; color: rgba(220,228,255,0.7); }
+  .card .ttl { font-family: "SansSC"; font-weight: 800; font-size: 19px; color: #f4f6ff; margin-top: 4px; }
+
+  /* 红色六边形防重护盾 */
+  #shield { position: absolute; left: 1080px; top: 250px; width: 320px; height: 320px; z-index: 240; pointer-events: none; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -52,12 +55,12 @@
     <div class="bg-type" style="left:30px;top:90px">ROUND_01</div>
 
     <div class="code-win" style="left:40px">
-      <div class="bar"><span>src/session.py</span><span style="color:#ff9ed2">SCANNER // AGENT_A</span></div>
+      <div class="bar"><span>src/session.py</span><span style="color:#ffb088">SCANNER // 橘座 A</span></div>
       <pre>
 <span class="ln">38</span><span class="kw">def</span> <span class="fn">load_profile</span>(req):
 <span class="ln">39</span>    tok = req.headers.get(<span class="str">"Auth"</span>)
 <span class="ln">40</span>    user = <span class="fn">get_current_user</span>(tok)
-<span class="ln">41</span>    <span class="cm"># user may be None when token expires</span>
+<span class="ln">41</span>    <span class="cm"># L42: null deref under race</span>
 <span class="ln">42</span>    uid = user.id
 <span class="ln">43</span>    role = user.role.strip()
 <span class="ln">44</span>    <span class="kw">return</span> db.<span class="fn">query</span>(uid, role)
@@ -66,13 +69,13 @@
 <span class="ln">47</span>    left = <span class="kw">await</span> stock.<span class="fn">get</span>(oid)
 <span class="ln">48</span>    <span class="kw">if</span> left >= n:
 <span class="ln">49</span>        <span class="kw">await</span> stock.<span class="fn">set</span>(oid, left - n)</pre>
-      <div class="bug-hl" id="hlL1" style="top:172px;height:60px"></div>
-      <div class="bug-hl" id="hlL2" style="top:310px;height:86px"></div>
+      <div class="bug-hl" id="hlL1" style="top:164px;height:58px"></div>
+      <div class="bug-hl" id="hlL2" style="top:298px;height:82px"></div>
       <div class="scan" id="scanL"></div>
     </div>
 
-    <div class="code-win" style="left:1290px">
-      <div class="bar"><span>src/db/pool.py</span><span style="color:#93ccff">SCANNER // AGENT_B</span></div>
+    <div class="code-win" style="left:1300px">
+      <div class="bar"><span>src/db/pool.py</span><span style="color:#93ccff">SCANNER // 狸花 B</span></div>
       <pre>
 <span class="ln">116</span><span class="kw">def</span> <span class="fn">run_tx</span>(sql, args):
 <span class="ln">117</span>    conn = pool.<span class="fn">acquire</span>()
@@ -84,20 +87,22 @@
 <span class="ln">123</span>        <span class="str">f"SELECT * ORDER BY {args}"</span>
 <span class="ln">124</span>    )
 <span class="ln">125</span>    <span class="kw">return</span> cur.<span class="fn">fetchall</span>()</pre>
-      <div class="bug-hl" id="hlR1" style="top:116px;height:86px"></div>
-      <div class="bug-hl" id="hlR2" style="top:240px;height:60px"></div>
+      <div class="bug-hl" id="hlR1" style="top:112px;height:82px"></div>
+      <div class="bug-hl" id="hlR2" style="top:232px;height:58px"></div>
       <div class="scan" id="scanR"></div>
     </div>
 
     <div id="chan">
-      <div class="hdr"><span>HAKIMI-HISS-CHANNEL // LIVE REGISTRY</span><span>DEDUP: ±5 LINES</span></div>
+      <div class="hdr"><span>HAKIMI-HISS-CHANNEL // DEDUP REGISTRY</span><span>SHIELD: ±5 LINES</span></div>
       <div class="score">
-        <div><div class="lbl">AGENT_A (橘座)</div><div class="num a" id="scA">0</div></div>
+        <div><div class="lbl">哈基米A (橘座)</div><div class="num a" id="scA">0</div></div>
         <div style="font-size:14px;color:rgba(255,255,255,0.35)">VS</div>
-        <div style="text-align:right"><div class="lbl">AGENT_B (狸花)</div><div class="num b" id="scB">0</div></div>
+        <div style="text-align:right"><div class="lbl">哈基米B (狸花)</div><div class="num b" id="scB">0</div></div>
       </div>
       <div id="cards" style="position:relative"></div>
     </div>
+
+    <canvas id="shield" width="320" height="320"></canvas>
   </div>
   <div class="vignette"></div>
   <div class="flash" id="flash"></div>
@@ -113,21 +118,21 @@ const T1 = +(S.S08.start - 0.1).toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
 const E = {
-  c1: S.S05.start + 1.2,      // A 抢先登记 BUG-001
-  c2: S.S05.start + 2.8,      // B 登记 BUG-002
-  c3: S.S06.start + 0.5,      // A 登记 BUG-003
-  dupTry: S.S06.start + 1.4,  // B 提交 session.py:44
-  dupHit: S.S06.start + 1.8,  // 系统立刻弹出防重通知，B 看到并念出 “系统弹窗说相近五行重复当场拦截？！”
-  c4: S.S07.start - 0.6,      // B 改报 BUG-004
-  c5: S.S07.start - 0.2,      // A 登记 BUG-005
-  win: S.S07.start + 1.0,     // 系统弹出【一胜】通告，A 看着通告得意念出 “看系统通告没？三比二，一胜归本喵！”
+  c1: S.S05.start + 0.9,       // A 一爪拍下 BUG-001，计分板 A 跳成 1，弹出【BUG-001 抢注成功】
+  c2: S.S05.start + 3.4,       // B 登记 BUG-002
+  c3: S.S06.start + 0.4,       // A 登记 BUG-003
+  dupTry: S.S06.start + 1.2,   // B 扑向 L44 提交
+  dupHit: S.S06.start + 1.7,   // 撞上红色防重护盾被弹开 + 【实时防重拦截 DUPLICATE】弹窗
+  c4: S.S06.end - 0.8,         // B 换文件抓边界 BUG-004
+  c5: S.S07.start - 0.1,       // A 登记 BUG-005
+  win: S.S07.start + 0.25,     // 【第一局结算 · SUSPENDED_ROUND1】弹窗
 };
 
 let G = {};
 window.__ready = (async () => {
   await document.fonts.load('900 80px "SerifSC"');
   await document.fonts.load('900 32px "SansSC"');
-  await document.fonts.load('700 16px "Mono"');
+  await document.fonts.load('800 16px "Mono"');
   const im = await K.loadImages({ inspect: A + "pose04.png", smug: A + "pose05.png", shock: A + "pose06.png" });
   build(im);
   await document.fonts.ready;
@@ -135,70 +140,116 @@ window.__ready = (async () => {
 
 function build(im) {
   const root = $("root");
-  UI.hud(root, { left: "AGENT_A · 橘座 // HUNTING", mid: "PHASE: ROUND1_HUNTING · DEDUP ACTIVE", right: "AGENT_B · 狸花 // HUNTING" });
+  UI.hud(root, { left: "哈基米A (橘座) // HUNTING", mid: "ROUND1_HUNTING · DEDUP SHIELD ARMED", right: "哈基米B (狸花) // HUNTING" });
 
-  G.aInspect = UI.char(root, im.inspect, { x: 220, y: 1200, h: 680, cls: "glow-a" });
-  G.aSmug = UI.char(root, im.smug, { x: 220, y: 1200, h: 680, cls: "glow-a" });
-  G.bInspect = UI.char(root, im.inspect, { x: 1700, y: 1200, h: 680, cls: "glow-b" });
-  G.bShock = UI.char(root, im.shock, { x: 1700, y: 1200, h: 680, cls: "glow-b" });
+  G.aInspect = UI.char(root, im.inspect, { x: 210, y: 1200, h: 680, cls: "glow-a" });
+  G.aSmug = UI.char(root, im.smug, { x: 210, y: 1200, h: 680, cls: "glow-a" });
+  G.bInspect = UI.char(root, im.inspect, { x: 1710, y: 1200, h: 680, cls: "glow-b" });
+  G.bShock = UI.char(root, im.shock, { x: 1710, y: 1200, h: 680, cls: "glow-b" });
 
-  G.bA1 = UI.polyBubble(root, {
-    x: 330, y: 695, w: 480, h: 155, who: "GEMINI_A // LOGGED FIRST", theme: "a", tailDir: "left",
-    zh: 'L42 空指针——<span class="hl-a">本喵先往通道里登上了！</span>', en: "LINE 42 NULL POINTER—LOGGED FIRST!",
-  });
-  G.bB1 = UI.polyBubble(root, {
-    x: 1060, y: 690, w: 540, h: 165, who: "GEMINI_B // READING INTERCEPT POPUP", theme: "b", tailDir: "right", spiky: true,
-    zh: '咦？！系统弹窗说<br><span class="hl-b">「相近五行的重复虫子当场拦截」？！</span>', en: "SYSTEM SAYS 'NEAR-LINE DUPLICATE BLOCKED ON SIGHT'?!",
-  });
-  G.bA2 = UI.polyBubble(root, {
-    x: 330, y: 690, w: 530, h: 165, who: "GEMINI_A // POINTING AT NOTICE", theme: "a", tailDir: "left", spiky: true,
-    zh: '哈——！慢了一爪！看系统通告没？<br><span class="hl-a">三比二，【一胜】归本喵了！</span>', en: "SEE THE SYSTEM NOTICE? 3 TO 2, ROUND 1 IS MINE!",
+  // S05 系统通知：【BUG-001 抢注成功】
+  G.sysB1 = UI.sysNotice(root, {
+    x: 520, y: 668, w: 880, kind: "ok",
+    code: "CHANNEL REGISTRY // FIRST BLOOD", badge: "ACCEPTED",
+    tag: "【BUG-001 抢注成功】",
+    zh: "Finder: <b>A (橘座)</b> &nbsp;|&nbsp; <b>src/session.py:42</b> &nbsp;|&nbsp; HIGH · 空指针与并发竞态",
+    en: "hakimi_report_bug -> bug_id: BUG-001 · locked lines 37..47 against duplicates",
   });
 
+  // S06 系统通知：【实时防重拦截 DUPLICATE】
   G.sysDup = UI.sysNotice(root, {
-    x: 590, y: 365, w: 740, code: "SYSTEM NOTICE // RULE 02: DEDUP INTERCEPT", badge: "REJECTED", kind: "warn",
-    zh: "【防重规则触发】src/session.py:44 与已登记 BUG-001（L42-48）处于 ±5 行内，当场拦截！",
-    en: "hakimi_report_bug -> accepted: false · reason: DUPLICATE (within ±5 lines of BUG-001)",
+    x: 490, y: 660, w: 940, kind: "warn",
+    code: "DEDUP SHIELD TRIGGERED // DUPLICATE!", badge: "REJECTED",
+    tag: "【实时防重拦截 DUPLICATE】",
+    zh: "<b>src/session.py:44</b> 与 <b>BUG-001</b> 处于 ±5 行且语义重叠，已由橘座抢先叼走！",
+    en: "accepted: false · reason: DUPLICATE · " + "哈——！慢了一爪！这只虫子已被死对头抢先叼走登记了！",
   });
+
+  // S07 系统通知：【第一局结算 · SUSPENDED_ROUND1】
   G.sysWin = UI.sysNotice(root, {
-    x: 560, y: 360, w: 800, code: "SYSTEM NOTICE // ROUND 1 SETTLEMENT", badge: "【一胜】", kind: "gold",
-    zh: "【第一局结算通告】有效 Bug 3 : 2，哈基米A 夺得【一胜】！通道挂起等待铲屎官",
-    en: "hakimi_settle_round1 -> round1_winner: A (3 vs 2 valid bugs) · status: SUSPENDED",
+    x: 470, y: 655, w: 980, kind: "gold",
+    code: "ROUND 1 SETTLEMENT // SUSPENDED_ROUND1", badge: "【一胜】",
+    tag: "【第一局结算 · SUSPENDED_ROUND1】",
+    zh: "有效去重 Bug <b>3 : 2</b>（拦截重复 1 次）· <b>哈基米A 夺得【一胜】！</b>清单挂起移交铲屎官",
+    en: "hakimi_settle_round1 -> winner: A (3 vs 2) · 5 deduplicated bugs handed over to human",
+  });
+
+  // 角色折角气泡（放左右上方，不遮挡底部中央的系统弹窗）
+  G.bA5 = UI.polyBubble(root, {
+    x: 60, y: 470, w: 500, h: 165, who: "哈基米A (橘座) // FIRST PAW", theme: "a", tailDir: "bottom-left",
+    zh: '看爪！第四十二行空指针——<br><span class="hl-a">本喵先一步拍进通道了！</span>',
+    en: "LINE 42 NULL DEREF—SLAMMED INTO THE CHANNEL FIRST!",
+  });
+  G.bB6 = UI.polyBubble(root, {
+    x: 1320, y: 460, w: 540, h: 175, who: "哈基米B (狸花) // BOUNCED BY SHIELD?!", theme: "b", tailDir: "bottom-right", spiky: true,
+    zh: '唔？！慢了半爪居然<span class="hl-b">被防重护盾弹回来了？！</span><br>可恶，换个文件抓边界！',
+    en: "HALF A PAW LATE AND BOUNCED OFF THE DEDUP SHIELD?!",
+  });
+  G.bA7 = UI.polyBubble(root, {
+    x: 60, y: 465, w: 520, h: 170, who: "哈基米A (橘座) // ROUND 1 WINNER", theme: "a", tailDir: "bottom-left", spiky: true,
+    zh: '哈——！三比二！手慢无懂不懂？<br><span class="hl-a">这局「一胜」归本喵！</span>',
+    en: "3 TO 2! SNOOZE AND YOU LOSE—ROUND ONE IS MINE!",
   });
 
   const items = [
-    { id: "BUG-001", who: "A", file: "src/session.py:42", ttl: "token 为空时直接解引用 user.id", t: E.c1 },
-    { id: "BUG-002", who: "B", file: "src/db/pool.py:118", ttl: "异常分支未归还数据库连接", t: E.c2 },
-    { id: "BUG-003", who: "A", file: "src/OrderService.ts:87", ttl: "并发扣减库存未加锁导致超卖", t: E.c3 },
-    { id: "REJECTED", who: "B", file: "src/session.py:44", ttl: "user 为 None 时访问 user.id（±5 行撞车）", t: E.dupTry, dup: true },
-    { id: "BUG-004", who: "B", file: "src/api/search.py:31", ttl: "ORDER BY 直接拼接用户输入", t: E.c4 },
-    { id: "BUG-005", who: "A", file: "src/worker/queue.go:203", ttl: "重试计数未递增导致死循环", t: E.c5 },
+    { id: "BUG-001", who: "A", file: "src/session.py:42", ttl: "HIGH · 空指针与并发竞态", t: E.c1 },
+    { id: "BUG-002", who: "B", file: "src/db/pool.py:118", ttl: "HIGH · 异常分支连接池泄漏", t: E.c2 },
+    { id: "BUG-003", who: "A", file: "src/OrderService.ts:87", ttl: "HIGH · 并发扣减库存超卖竞态", t: E.c3 },
+    { id: "DUPLICATE!", who: "B", file: "src/session.py:44", ttl: "与 BUG-001 (±5行) 撞车，护盾弹回！", t: E.dupTry, dup: true },
+    { id: "BUG-004", who: "B", file: "src/api/search.py:31", ttl: "MEDIUM · ORDER BY 边界注入", t: E.c4 },
+    { id: "BUG-005", who: "A", file: "src/worker/queue.go:203", ttl: "MEDIUM · 失败分支重试死循环", t: E.c5 },
   ];
   G.cards = items.map((it, idx) => {
     const row = it.dup ? 3 : idx > 3 ? idx - 1 : idx;
     const c = UI.el("div", `card ${it.who}` + (it.dup ? " dup" : ""), $("cards"),
       `<div class="top"><span>[${it.id}] // AGENT_${it.who}</span><span>${it.file}</span></div>` +
       `<div class="ttl">${it.ttl}</div>`);
-    c.style.top = 12 + row * 90 + "px";
+    c.style.top = 12 + row * 84 + "px";
     c._it = it;
     return c;
   });
+}
+
+function drawShield(t) {
+  const c = $("shield").getContext("2d");
+  c.clearRect(0, 0, 320, 320);
+  const p = tw(t, E.dupHit, 0.16, ease.outBack) * (1 - tw(t, E.c4, 0.25));
+  if (p <= 0.01) return;
+  c.save();
+  c.translate(160, 160); c.scale(p, p);
+  // 六边形红色能量防重护盾
+  c.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i / 6) * Math.PI * 2 - Math.PI / 6;
+    const x = Math.cos(a) * 125, y = Math.sin(a) * 125;
+    i ? c.lineTo(x, y) : c.moveTo(x, y);
+  }
+  c.closePath();
+  c.fillStyle = "rgba(255, 38, 84, 0.28)"; c.fill();
+  c.lineWidth = 5; c.strokeStyle = "#ff3b6b"; c.stroke();
+  c.font = '900 32px "Mono"'; c.fillStyle = "#fff"; c.textAlign = "center";
+  c.fillText("DUPLICATE!", 0, 6);
+  c.font = '800 15px "SansSC"'; c.fillStyle = "#fecdd3";
+  c.fillText("±5 行防重护盾反弹", 0, 34);
+  c.restore();
 }
 
 function render(t) {
   const c = $("bg").getContext("2d");
   c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
   const g = c.createRadialGradient(960, 420, 40, 960, 420, 900);
-  g.addColorStop(0, t >= E.dupHit && t < E.c4 ? "rgba(255, 64, 104, 0.22)" : "rgba(139, 92, 246, 0.14)");
+  g.addColorStop(0, t >= E.dupHit && t < E.c4 ? "rgba(255, 46, 91, 0.26)" : t >= E.win ? "rgba(245, 158, 11, 0.22)" : "rgba(168, 85, 247, 0.15)");
   g.addColorStop(1, "rgba(7, 8, 17, 0)");
   c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
 
-  const [sx, sy] = shake(t, E.dupHit, 0.42, 18);
-  const [sx2, sy2] = shake(t, E.win, 0.35, 12);
+  drawShield(t);
+
+  const [sx, sy] = shake(t, E.dupHit, 0.42, 20);
+  const [sx2, sy2] = shake(t, E.win, 0.35, 14);
   $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
-  $("scanL").style.top = 50 + ((t * 210) % 520) + "px";
-  $("scanR").style.top = 50 + (((t + 1.1) * 210) % 520) + "px";
+  $("scanL").style.top = 46 + ((t * 210) % 500) + "px";
+  $("scanR").style.top = 46 + (((t + 1.1) * 210) % 500) + "px";
   $("hlL1").style.opacity = tw(t, E.c1 - 0.3, 0.25);
   $("hlR1").style.opacity = tw(t, E.c2 - 0.3, 0.25);
   $("hlL2").style.opacity = tw(t, E.c3 - 0.3, 0.25);
@@ -208,13 +259,15 @@ function render(t) {
   G.cards.forEach((card) => {
     const it = card._it;
     if (it.dup) {
-      const pIn = tw(t, it.t, 0.22, ease.outBack);
-      const pOut = tw(t, E.c4 - 0.1, 0.25, ease.inQuad);
-      UI.put(card, { x: (1 - pIn) * 320 + pOut * 420, o: clamp(pIn * 3) * (1 - pOut) });
+      // 扑向通道 → 撞上护盾向右侧弹飞
+      const pIn = tw(t, it.t, 0.18, ease.outCubic);
+      const bounce = tw(t, E.dupHit, 0.35, ease.outCubic);
+      const fade = tw(t, E.c4 - 0.15, 0.2);
+      UI.put(card, { x: (1 - pIn) * 300 + bounce * 420, y: bounce * -40, r: bounce * 14, o: clamp(pIn * 3) * (1 - fade) });
     } else {
-      const p = tw(t, it.t, 0.26, ease.outBack);
+      const p = tw(t, it.t, 0.25, ease.outBack);
       UI.put(card, { x: (1 - p) * (it.who === "A" ? -320 : 320), s: p, o: clamp(p * 3) });
-      if (t >= it.t + 0.1) { if (it.who === "A") aCnt++; else bCnt++; }
+      if (t >= it.t + 0.08) { if (it.who === "A") aCnt++; else bCnt++; }
     }
   });
   $("scA").textContent = aCnt;
@@ -225,27 +278,27 @@ function render(t) {
   UI.put(G.aInspect, { y: bob, o: aSmugOn ? 0 : 1 });
   UI.put(G.aSmug, { y: bob, s: aSmugOn ? tw(t, S.S07.start, 0.25, ease.outBack) : 0, o: aSmugOn ? 1 : 0 });
 
-  const bShockOn = t >= E.dupHit;
+  const bShockOn = t >= E.dupHit && t < E.c4 + 0.3;
   UI.put(G.bInspect, { sx: -1, y: -bob, o: bShockOn ? 0 : 1 });
-  const jolt = bShockOn && t < S.S07.start + 0.8 ? Math.sin(onTwos(t, 24) * 28) * 7 : 0;
+  const jolt = bShockOn ? Math.sin(onTwos(t, 24) * 28) * 8 : 0;
   UI.put(G.bShock, { x: jolt, o: bShockOn ? 1 : 0 });
 
-  const pBA1 = tw(t, S.S05.start + 0.3, 0.26, ease.outBack) * (1 - tw(t, S.S06.start, 0.2));
-  const pBB1 = tw(t, E.dupHit + 0.1, 0.26, ease.outBack) * (1 - tw(t, S.S07.start, 0.2));
-  const pBA2 = tw(t, S.S07.start, 0.26, ease.outBack);
-  UI.put(G.bA1, { s: pBA1, o: clamp(pBA1 * 3), r: -1 });
-  UI.put(G.bB1, { s: pBB1, o: clamp(pBB1 * 3), r: 1 });
-  UI.put(G.bA2, { s: pBA2, o: clamp(pBA2 * 3), r: -1.2 });
+  const pA5 = tw(t, S.S05.start + 0.2, 0.26, ease.outBack) * (1 - tw(t, S.S06.start, 0.2));
+  const pB6 = tw(t, E.dupHit + 0.05, 0.26, ease.outBack) * (1 - tw(t, S.S07.start, 0.2));
+  const pA7 = tw(t, S.S07.start, 0.26, ease.outBack);
+  UI.put(G.bA5, { s: pA5, o: clamp(pA5 * 3), r: -1 });
+  UI.put(G.bB6, { s: pB6, o: clamp(pB6 * 3), r: 1 });
+  UI.put(G.bA7, { s: pA7, o: clamp(pA7 * 3), r: -1.2 });
 
-  const pDup = tw(t, E.dupHit, 0.22, ease.outBack) * (1 - tw(t, E.win - 0.15, 0.22));
-  UI.put(G.sysDup, { s: lerp(1.4, 1, pDup), o: clamp(pDup * 4) });
-
-  const pWin = tw(t, E.win, 0.28, ease.outBack);
-  UI.put(G.sysWin, { s: pWin, o: clamp(pWin * 3) });
+  // 三条强存在感系统弹窗依次接力
+  UI.putNotice(G.sysB1, t, E.c1, { outT: E.dupHit - 0.08, yFrom: 36 });
+  UI.putNotice(G.sysDup, t, E.dupHit, { outT: E.win - 0.08, yFrom: 36 });
+  UI.putNotice(G.sysWin, t, E.win, { yFrom: 36 });
 
   $("flash").style.opacity = Math.max(
     kf(t, [[T0, 0.7], [T0 + 0.18, 0]]),
-    kf(t, [[E.dupHit - 0.01, 0], [E.dupHit, 0.65], [E.dupHit + 0.12, 0]])
+    kf(t, [[E.dupHit - 0.01, 0], [E.dupHit, 0.70], [E.dupHit + 0.14, 0]]),
+    kf(t, [[E.win - 0.01, 0], [E.win, 0.55], [E.win + 0.14, 0]])
   );
 }
 

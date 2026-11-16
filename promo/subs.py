@@ -1,8 +1,7 @@
-"""生成独立 ASS 中英双语字幕层（按说话人区分颜色：A 樱粉白、B 冰蓝白、AB 双猫亮紫）。"""
+"""生成独立 ASS 中英双语字幕层 v3（按说话人区分：A（橘座）暖橘金、B（狸花）冰晶蓝、A + B 双猫亮白）。"""
 import json
 import pathlib
 import subprocess
-import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent
 
@@ -15,10 +14,10 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: A,Noto Sans SC,44,&H00EA9EFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.8,0,1,4.0,1.5,2,80,80,26,1
-Style: B,Noto Sans SC,44,&H00FFD293,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.8,0,1,4.0,1.5,2,80,80,26,1
-Style: AB,Noto Sans SC,50,&H00FFFFFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,1.2,0,1,4.5,2.0,2,80,80,26,1
-Style: EN,Noto Sans SC,26,&H00D8C4B8,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.5,0,1,3.0,1.0,2,80,80,26,1
+Style: A,Noto Sans SC,42,&H009BBDFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.6,0,1,4.0,1.5,2,60,60,24,1
+Style: B,Noto Sans SC,42,&H00FFD293,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.6,0,1,4.0,1.5,2,60,60,24,1
+Style: AB,Noto Sans SC,48,&H00FFFFFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,1.2,0,1,4.5,2.0,2,60,60,24,1
+Style: EN,Noto Sans SC,25,&H00D8C4B8,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.4,0,1,3.0,1.0,2,60,60,24,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -37,7 +36,7 @@ def write_ass(ass_path, max_t=None):
         if max_t and s["start"] >= max_t:
             break
         st = s["who"] if s["who"] in ("A", "B", "AB") else "A"
-        tag = "[哈基米A] " if st == "A" else "[哈基米B] " if st == "B" else ""
+        tag = "A（橘座）：" if st == "A" else "B（狸花）：" if st == "B" else "A + B："
         t0, t1 = tc(s["start"]), tc(s["end"] + 0.12)
         lines.append(f"Dialogue: 0,{t0},{t1},{st},,0,0,0,,{{\\fad(80,80)}}{tag}{s['zh']}\\N{{\\rEN}}{s['en']}")
     ass_path.write_text("\n".join(lines), encoding="utf-8")

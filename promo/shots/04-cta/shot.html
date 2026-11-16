@@ -2,22 +2,52 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>04-cta · 看见持久上下文系统通知 → 继续互哈 & 仓库卡片</title>
+<title>04-cta · S11 持久化 conv_id 灵魂锁链 → S12 撕符纸回弹重修 & 定格项目 Logo 与 Slogan</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
   #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
 
-  #cta-card { position: absolute; left: 86px; top: 108px; width: 920px; padding: 34px 44px;
-    background: rgba(11, 13, 26, 0.90); backdrop-filter: blur(18px); border: 1px solid rgba(167,139,250,0.42);
-    box-shadow: 0 28px 70px rgba(0,0,0,0.85), 0 0 40px rgba(139,92,246,0.18); z-index: 25;
-    clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); }
-  #cta-card .k { font-family: "Mono"; font-size: 13px; letter-spacing: 3px; color: #c4b5fd; }
-  #cta-card .title { font-family: "SerifSC"; font-weight: 900; font-size: 72px; color: #fff; letter-spacing: 4px; margin-top: 6px; }
-  #cta-card .sub { font-family: "Mono"; font-weight: 700; font-size: 18px; letter-spacing: 4px; color: #ff8ec7; margin-top: 4px; }
-  #cta-card .quote { font-family: "SansSC"; font-weight: 800; font-size: 24px; color: rgba(236,240,255,0.88); margin-top: 18px;
-    padding-left: 16px; border-left: 3px solid #a78bfa; }
-  #cta-card .repo { display: inline-block; margin-top: 20px; padding: 10px 22px; background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(124,196,255,0.55); font-family: "Mono"; font-weight: 700; font-size: 22px; color: #93ccff; letter-spacing: 1px; }
+  /* 顶部双猫持久化灵魂锁链条 */
+  #soul-bar { position: absolute; left: 90px; top: 88px; width: 920px; height: 96px;
+    background: rgba(14, 16, 32, 0.94); border: 2px solid #a78bfa;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.85), 0 0 36px rgba(167,139,250,0.35);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 28px; box-sizing: border-box; z-index: 30; }
+  .node-pill { display: flex; align-items: center; gap: 12px; font-family: "Mono"; font-weight: 800; font-size: 16px; }
+  .node-pill .dot { width: 14px; height: 14px; border-radius: 50%; }
+  .node-pill.a { color: #ffbd9b; }
+  .node-pill.a .dot { background: #ff9e6e; box-shadow: 0 0 14px #ff9e6e; }
+  .node-pill.b { color: #93ccff; }
+  .node-pill.b .dot { background: #6eb8ff; box-shadow: 0 0 14px #6eb8ff; }
+  .chain-mid { flex: 1; margin: 0 20px; position: relative; height: 36px; display: flex; align-items: center; justify-content: center; }
+  .chain-line { position: absolute; left: 0; right: 0; height: 4px;
+    background: repeating-linear-gradient(90deg, #a78bfa 0 18px, #38bdf8 18px 36px);
+    box-shadow: 0 0 18px #a78bfa; }
+  .chain-lock { position: relative; padding: 5px 18px; background: #1e1538; border: 2px solid #c4b5fd;
+    font-family: "Mono"; font-weight: 800; font-size: 13px; color: #ede9fe; letter-spacing: 2px;
+    box-shadow: 0 0 20px rgba(167,139,250,0.65); }
+
+  /* S12 项目 Logo 与 Slogan 终局定格大卡 */
+  #cta-card { position: absolute; left: 90px; top: 530px; width: 920px; padding: 28px 38px;
+    background: linear-gradient(165deg, rgba(16, 18, 38, 0.96), rgba(9, 11, 24, 0.96));
+    border: 2.5px solid #a78bfa;
+    box-shadow: 0 28px 70px rgba(0,0,0,0.9), 0 0 55px rgba(139,92,246,0.38); z-index: 45;
+    display: flex; align-items: center; gap: 32px; box-sizing: border-box;
+    clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px)); }
+  #cta-card img.logo { width: 156px; height: 156px; object-fit: cover; border-radius: 18px;
+    border: 2px solid rgba(255,255,255,0.28); box-shadow: 0 12px 32px rgba(0,0,0,0.75); flex-shrink: 0; }
+  #cta-card .k { font-family: "Mono"; font-size: 13px; font-weight: 800; letter-spacing: 2.5px; color: #c4b5fd; }
+  #cta-card .title { font-family: "SerifSC"; font-weight: 900; font-size: 56px; color: #fff; letter-spacing: 3px; margin-top: 4px; line-height: 1.08; }
+  #cta-card .sub { font-family: "Mono"; font-weight: 800; font-size: 16px; letter-spacing: 3px; color: #ff9e6e; margin-top: 4px; }
+  #cta-card .quote { font-family: "SansSC"; font-weight: 900; font-size: 23px; color: #fde68a; margin-top: 12px;
+    padding-left: 14px; border-left: 4px solid #fbbf24; }
+  #cta-card .repo { display: inline-block; margin-top: 14px; padding: 8px 20px; background: rgba(110, 184, 255, 0.14);
+    border: 1.5px solid #6eb8ff; font-family: "Mono"; font-weight: 800; font-size: 19px; color: #bae0ff; letter-spacing: 1px; }
+
+  /* B 头顶一闪一闪等待二次唤醒的【啥子】呼吸灯牌 */
+  #shazi-beacon { position: absolute; left: 1480px; top: 300px; padding: 8px 20px;
+    background: rgba(52, 8, 18, 0.95); border: 2.5px solid #ff3b5c;
+    font-family: "Mono"; font-weight: 800; font-size: 15px; color: #fda4af; letter-spacing: 2px;
+    box-shadow: 0 0 30px rgba(255, 59, 92, 0.75); z-index: 260; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -30,19 +60,33 @@
     <div class="grid"></div>
     <div class="bg-type" style="left:40px;bottom:80px">HAKIMI_HISS</div>
 
+    <div id="soul-bar">
+      <div class="node-pill a"><span class="dot"></span><span>橘座 conv_id: 9f3a..c1 [LOCKED]</span></div>
+      <div class="chain-mid">
+        <div class="chain-line"></div>
+        <div class="chain-lock">⛓ SOUL-CHAIN PERSISTED</div>
+      </div>
+      <div class="node-pill b"><span>狸花 conv_id: 4b8e..d9 [啥子 QUEUED]</span><span class="dot"></span></div>
+    </div>
+
+    <div id="shazi-beacon">⚠ STATUS: 【啥子】 // AWAITING RE-WAKE</div>
+
     <div id="cta-card">
-      <div class="k">ANTIGRAVITY PLUGIN // STDIO MCP + SUBAGENT DUEL</div>
-      <div class="title">哈基米哈气审查</div>
-      <div class="sub">HAKIMI HISS DUEL · V1.0</div>
-      <div class="quote">“依旧两哈基米（Gemini）相互哈气就算审查了”</div>
-      <div class="repo">github.com/AOE20000/hakimi-hiss</div>
+      <img class="logo" src="../../../assets/logo.png" alt="Hakimi Hiss Logo">
+      <div>
+        <div class="k">ANTIGRAVITY PLUGIN // STDIO MCP + DUAL-SUBAGENT DUEL</div>
+        <div class="title">哈基米哈气审查</div>
+        <div class="sub">HAKIMI HISS DUEL · GITHUB.COM/AOE20000/HAKIMI-HISS</div>
+        <div class="quote">“依旧两哈基米相互哈气就算审查了！”</div>
+        <div class="repo">★ github.com/AOE20000/hakimi-hiss</div>
+      </div>
     </div>
   </div>
   <div class="vignette"></div>
   <div class="flash" id="flash"></div>
 </div>
 <script>
-const { tw, kf, ease, clamp, lerp, onTwos } = K;
+const { tw, kf, ease, clamp, lerp, shake, onTwos } = K;
 const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
 const S = {}; ["S11", "S12"].forEach((id) => (S[id] = K.seg(id)));
@@ -51,39 +95,66 @@ const T0 = +(S.S11.start - 0.1).toFixed(3);
 const T1 = +window.VOICE.total.toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
+const E = {
+  sysMem: T0 + 0.12,           // S11：长期上下文保持系统弹窗
+  tearTry: S.S12.start + 0.15, // S12：B 气得撕起半截符纸
+  snapBack: S.S12.start + 0.95,// 符纸啪地弹回脑门！
+  cta: S.S12.start + 1.35,     // 项目 Logo 与 Slogan 定格大卡弹出
+  finalHiss: S.S12.end - 0.85, // 结尾「嘶哈——！！」
+};
+
 let G = {};
 window.__ready = (async () => {
   await document.fonts.load('900 80px "SerifSC"');
   await document.fonts.load('900 32px "SansSC"');
   await document.fonts.load('700 16px "Mono"');
-  const im = await K.loadImages({ wink: A + "pose10.png", hissL: A + "pose03.png" });
+  const im = await K.loadImages({
+    wink: A + "pose10.png", dizzy: A + "pose09.png", typing: A + "pose07.png", hissL: A + "pose03.png",
+  });
   build(im);
   await document.fonts.ready;
 })();
 
 function build(im) {
   const root = $("root");
-  UI.hud(root, { left: "AGENT_A · 橘座 // SESSION PERSISTED", mid: "CONVERSATION_ID BOUND · READY FOR RE-REVIEW", right: "AGENT_B · 狸花 // 【啥子】" });
+  UI.hud(root, {
+    left: "哈基米A（橘座）// CONV_ID LOCKED",
+    mid: "PERSISTENT MEMORY · ONLY_SHAZI=TRUE READY",
+    right: "哈基米B（狸花）// 【啥子】 RE-FIX MODE",
+  });
 
-  G.aWink = UI.char(root, im.wink, { x: 1280, y: 1230, h: 980, cls: "glow-a" });
-  G.bHiss = UI.char(root, im.hissL, { x: 1680, y: 1230, h: 940, cls: "glow-b" });
+  // 角色：A 得意眨眼，B 从顶着符纸抓狂 → 扑向键盘重修/炸毛哈气
+  G.aWink = UI.char(root, im.wink, { x: 1230, y: 1230, h: 920, cls: "glow-a" });
+  G.bDizzy = UI.char(root, im.dizzy, { x: 1660, y: 1230, h: 900, cls: "glow-b" });
+  G.bRefix = UI.char(root, im.hissL, { x: 1660, y: 1230, h: 920, cls: "glow-b" });
 
-  // 右下角系统规则通知 05：持久上下文与啥子重修（A 指着它念 S11）
+  // B 脑门上的黄色【啥子】符纸（S12 开头被扯起半截又弹回）
+  G.talisman = UI.talisman(root, { x: 1615, y: 345 });
+
+  // S11 强存在感绿色系统弹窗：长期上下文保持
   G.sysMem = UI.sysNotice(root, {
-    x: 86, y: 520, w: 920, code: "SYSTEM NOTICE // RULE 06: PERSISTENT CONTEXT & RE-FIX", badge: "KEEP-ALIVE", kind: "ok",
-    zh: "【长期上下文保持】已持久化保存 A/B 的 conversationId，带【啥子】标记的 Bug 随时唤醒复审或重修（支持 hakimi_reset 重置）",
-    en: "send_message -> wakes identical A/B instances with full memory · 【啥子】 stays queued until fixed",
+    x: 90, y: 210, w: 920,
+    code: "SYSTEM NOTICE // PERSISTENT CONTEXT & TARGETED RE-WAKE",
+    badge: "CONV_ID LOCKED",
+    tag: "SEND_MESSAGE · ONLY_SHAZI=TRUE · FULL MEMORY RETAINED",
+    kind: "ok",
+    zh: "【长期上下文保持】已持久化绑定 A/B conversationId · 支持 only_shazi=true 随时带记忆传唤重修",
+    en: "hakimi_recheck(only_shazi=true) -> wakes exact A/B instances via bound conversationId",
   });
 
   G.bA11 = UI.polyBubble(root, {
-    x: 1020, y: 110, w: 540, h: 175, who: "GEMINI_A // POINTING AT KEEP-ALIVE NOTICE", theme: "a", tailDir: "bottom-left",
-    zh: '看通知——「上下文长期保持，<br><span class="hl-a">啥子随时拉出来重修」</span>！还不快改！',
-    en: "READ THE NOTICE—CONTEXT PERSISTS FOR RE-FIX! GET TO WORK!",
+    x: 1030, y: 88, w: 580, h: 185, who: "A（橘座）// SOUL-CHAIN LOCKED", theme: "a", tailDir: "bottom-left",
+    zh: '咱俩的上下文记忆可是锁死的——顶着你的「啥子」称号，<span class="hl-a">乖乖背着黑历史返工吧！</span>',
+    en: "OUR CONTEXT MEMORY IS LOCKED TOGETHER—WEAR YOUR 'DUMMY' TAG AND RE-FIX IT!",
   });
   G.bB12 = UI.polyBubble(root, {
-    x: 1260, y: 310, w: 560, h: 175, who: "GEMINI_B // REMATCH!", theme: "b", tailDir: "bottom-right", spiky: true,
-    zh: '本喵才不是啥子！<br><span class="hl-b">等我重修完再跟你哈过！哈——！</span>',
-    en: "I'M NOT A DUMMY! WAIT TILL I RE-FIX THIS AND HISS YOU AGAIN!",
+    x: 1180, y: 105, w: 660, h: 190, who: "B（狸花）// TEARING TALISMAN & RE-FIXING!", theme: "b", tailDir: "bottom-right", spiky: true,
+    zh: '本喵才不是啥子！开启专项重修——<br><span class="hl-b">等我跑通全套测试，再跟你哈上三百回合！嘶哈——！！</span>',
+    en: "I'M NO DUMMY! RUNNING FULL TESTS FOR 300 MORE ROUNDS—HISS!!",
+  });
+
+  G.sfxEnd = UI.sfxSerif(root, {
+    x: 1060, y: 690, zh: "嘶哈——!!", sub: "REMATCH // 300 ROUNDS!", size: 112, subColor: "#93ccff", align: "center",
   });
 }
 
@@ -91,26 +162,77 @@ function render(t) {
   const c = $("bg").getContext("2d");
   c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
   let g = c.createRadialGradient(1380, 480, 40, 1380, 480, 820);
-  g.addColorStop(0, "rgba(167, 139, 250, 0.24)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+  g.addColorStop(0, "rgba(167, 139, 250, 0.26)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
   c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
 
-  const pc = tw(t, T0 + 0.1, 0.35, ease.outBack);
-  UI.put($("cta-card"), { x: (1 - pc) * -120, s: pc, o: clamp(pc * 3) });
+  // 绘制作用于 A 与 B 之间的发光灵魂锁链连线
+  c.save();
+  c.strokeStyle = "rgba(167, 139, 250, 0.55)";
+  c.lineWidth = 3;
+  c.setLineDash([12, 8]);
+  c.lineDashOffset = -t * 60;
+  c.beginPath();
+  c.moveTo(1230, 560);
+  c.quadraticCurveTo(1445, 470 + Math.sin(t * 5) * 18, 1660, 560);
+  c.stroke();
+  c.restore();
 
-  const pm = tw(t, T0 + 0.2, 0.32, ease.outBack);
-  UI.put(G.sysMem, { y: (1 - pm) * 40, s: pm, o: clamp(pm * 3) });
+  const [sx, sy] = shake(t, E.snapBack, 0.35, 16);
+  const [sx2, sy2] = shake(t, E.finalHiss, 0.45, 18);
+  $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
+
+  const ps = tw(t, T0 + 0.05, 0.32, ease.outBack);
+  UI.put($("soul-bar"), { y: (1 - ps) * -50, s: ps, o: clamp(ps * 3) });
+
+  // B 头顶一闪一闪的【啥子】呼吸灯牌
+  const blink = 0.55 + 0.45 * Math.sin(t * 12);
+  UI.put($("shazi-beacon"), { s: ps, o: clamp(ps * 3) * blink });
+
+  // S11 强存在感系统通知弹窗
+  UI.putNotice(G.sysMem, t, E.sysMem);
+
+  // S12 定格项目 Logo 与 Slogan 大卡
+  const pc = tw(t, E.cta, 0.34, ease.outBack);
+  UI.put($("cta-card"), { x: (1 - pc) * -140, s: pc, o: clamp(pc * 3) });
 
   const bob = Math.sin(onTwos(t) * 4) * 6;
   UI.put(G.aWink, { y: bob });
-  const pb = tw(t, S.S12.start - 0.15, 0.28, ease.outBack);
-  UI.put(G.bHiss, { x: (1 - pb) * 220, s: pb, y: -bob, o: clamp(pb * 3) });
 
-  const pA11 = tw(t, S.S11.start + 0.1, 0.28, ease.outBack);
-  const pB12 = tw(t, S.S12.start, 0.26, ease.outBack);
+  const inRefix = t >= E.snapBack;
+  UI.put(G.bDizzy, { y: -bob, o: inRefix ? 0 : 1 });
+  UI.put(G.bRefix, {
+    s: inRefix ? tw(t, E.snapBack, 0.25, ease.outBack) : 0,
+    y: -bob,
+    o: inRefix ? 1 : 0,
+  });
+
+  // 黄色【啥子】符纸动画：S11 贴在脑门 → S12 开头被撕起半截拉偏 → E.snapBack 啪地弹回脑门！
+  let talX = 12, talY = -36 - bob, talR = 8, talS = 0.68;
+  if (t >= E.tearTry && t < E.snapBack) {
+    const pTear = clamp((t - E.tearTry) / (E.snapBack - E.tearTry));
+    talX = 12 + pTear * 85;
+    talY = -36 - pTear * 55;
+    talR = 8 + pTear * 38;
+    talS = 0.68 + pTear * 0.14;
+  } else if (t >= E.snapBack) {
+    const dt = t - E.snapBack;
+    talR = 8 + Math.sin(dt * 22) * Math.exp(-dt * 2.5) * 24;
+  }
+  UI.put(G.talisman, { x: talX, y: talY, r: talR, s: talS, o: 1 });
+
+  const pA11 = tw(t, S.S11.start + 0.1, 0.28, ease.outBack) * (1 - tw(t, S.S12.start - 0.1, 0.2));
+  const pB12 = tw(t, S.S12.start + 0.05, 0.26, ease.outBack);
   UI.put(G.bA11, { s: pA11, o: clamp(pA11 * 3), r: -1.2 });
   UI.put(G.bB12, { s: pB12, o: clamp(pB12 * 3), r: 1.5 });
 
-  $("flash").style.opacity = kf(t, [[T0, 0.7], [T0 + 0.18, 0]]);
+  const pHiss = tw(t, E.finalHiss, 0.22, ease.outBack);
+  UI.put(G.sfxEnd, { s: lerp(1.8, 1.0, pHiss), r: -5, o: clamp(pHiss * 4) });
+
+  $("flash").style.opacity = Math.max(
+    kf(t, [[T0, 0.7], [T0 + 0.18, 0]]),
+    kf(t, [[E.snapBack - 0.01, 0], [E.snapBack, 0.6], [E.snapBack + 0.14, 0]]),
+    kf(t, [[E.finalHiss - 0.01, 0], [E.finalHiss, 0.65], [E.finalHiss + 0.18, 0]])
+  );
 }
 
 window.__seek = async (t) => { render(t); };
