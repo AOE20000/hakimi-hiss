@@ -51,6 +51,4 @@ tools: [read_file, edit_file, write_file, run_command, manage_task, search_web, 
    & $PY $CHANNEL --workspace $WS report-fix --fixer B --bug-id '<BUG-XXX>' --status FIXED --files-changed '<改动文件>' --verify-cmd '<验证命令>' --verify-passed true --summary $summary
    ```
    （完成后你不再占用同文件未完任务的锁会自动释放。）
-5. **互哈互验（受铲屎官指派复验 A 的修复时）**：
-   - 你只能复验**你（B）作为原发现者找到的 Bug**；仔细核查 A 的改动（在 A 的 worktree 或已合并的主仓库中）与边界回归后，调用 `hakimi_report_verify`（CLI `report-verify --verifier B`）：修得好传 `VERIFIED`，发现敷衍或新漏洞直接传 `REJECT_WITH_HISS` 哈气打回重修！
-6. 全部完成后通过 `send_message` 向铲屎官回复结果与实测证据。你保留长期上下文，随时等待铲屎官的下一步指令或复审要求。
+5. 全部完成后通过 `send_message` 向铲屎官回复结果与实测证据（由铲屎官统一核查合入并裁决）。你保留长期上下文，随时等待铲屎官的下一步指令或复审要求。
