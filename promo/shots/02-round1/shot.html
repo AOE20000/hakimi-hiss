@@ -2,76 +2,62 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>02-round1 · 第一局：哈气找 Bug 与防重拦截</title>
+<title>02-round1 · 第一局：看见系统防重拦截弹窗与一胜通告</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
-  #root { position: absolute; inset: 0; background: #1e1836; }
-  /* 左右代码面板 + 中间通道计分板 */
-  .code-win { position: absolute; top: 145px; width: 610px; height: 740px; background: #131024; border: 6px solid #14101f;
-    border-radius: 18px; box-shadow: 10px 10px 0 #0c0918; overflow: hidden; font-family: monospace; z-index: 15; }
-  .code-win .bar { height: 48px; background: #261f42; border-bottom: 4px solid #14101f; display: flex; align-items: center;
-    padding: 0 18px; font-family: "NotoSC"; font-weight: 800; font-size: 22px; color: #e8e0ff; gap: 10px; }
-  .dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; }
-  .code-win pre { margin: 0; padding: 18px 20px; font-size: 21px; line-height: 1.55; color: #cfc8ea; }
-  .ln { color: #5b527a; user-select: none; margin-right: 14px; }
-  .kw { color: #ff7ab2; } .fn { color: #78e8ff; } .str { color: #ffe16b; }
-  .bug-hl { position: absolute; left: 12px; right: 12px; height: 34px; background: rgba(255, 72, 110, 0.28);
-    border: 3px solid #ff486e; border-radius: 6px; pointer-events: none; }
-  .scan { position: absolute; left: 0; right: 0; height: 6px; background: linear-gradient(90deg, transparent, #78e8ff, transparent); }
+  #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
+  .code-win { position: absolute; top: 100px; width: 590px; height: 590px; background: rgba(11, 13, 24, 0.86);
+    backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.75); overflow: hidden; font-family: "Mono"; z-index: 12; }
+  .code-win .bar { height: 40px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.04); border-bottom: 1px solid rgba(255,255,255,0.10);
+    font-size: 13px; letter-spacing: 1.5px; color: rgba(226,232,255,0.75); }
+  .code-win pre { margin: 0; padding: 18px 20px; font-size: 17px; line-height: 1.62; color: #c7d0f0; }
+  .ln { color: #4c5375; margin-right: 14px; }
+  .kw { color: #ff7ab8; } .fn { color: #7cc4ff; } .str { color: #fde047; } .cm { color: #687096; }
+  .bug-hl { position: absolute; left: 10px; right: 10px; background: rgba(255, 77, 109, 0.18);
+    border-left: 3px solid #ff4d6d; border-right: 1px solid rgba(255,77,109,0.45); pointer-events: none; }
+  .scan { position: absolute; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #a78bfa, transparent); box-shadow: 0 0 12px #a78bfa; }
 
-  /* 中央哈气通道 */
-  #chan { position: absolute; left: 655px; top: 135px; width: 610px; height: 760px; background: #fff9ef;
-    border: 7px solid #14101f; border-radius: 22px; box-shadow: 12px 12px 0 #14101f; z-index: 20; overflow: hidden; }
-  #chan .hdr { height: 76px; background: linear-gradient(90deg, #ff7ab2, #8c6bff, #5fb8ff); border-bottom: 6px solid #14101f;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff;
-    font-family: "KuaiLe"; font-size: 36px; text-shadow: 3px 3px 0 #14101f; }
-  #chan .hdr span { font-family: "Bangers"; font-size: 19px; letter-spacing: 2px; color: #ffe14d; }
-  .score { display: flex; justify-content: space-between; align-items: center; padding: 14px 34px;
-    background: #231b3d; color: #fff; border-bottom: 5px solid #14101f; font-family: "KuaiLe"; }
-  .score .side { font-size: 32px; display: flex; align-items: center; gap: 14px; }
-  .score .num { font-family: "Bangers"; font-size: 64px; color: #ffe14d; -webkit-text-stroke: 3px #14101f; }
-  .score .vs { font-family: "Bangers"; font-size: 42px; color: #ff6fae; }
+  #chan { position: absolute; left: 660px; top: 100px; width: 600px; height: 590px; background: rgba(12, 14, 28, 0.92);
+    border: 1px solid rgba(167,139,250,0.35); box-shadow: 0 28px 70px rgba(0,0,0,0.8); z-index: 18; overflow: hidden; }
+  #chan .hdr { height: 52px; padding: 0 22px; display: flex; align-items: center; justify-content: space-between;
+    background: rgba(167,139,250,0.10); border-bottom: 1px solid rgba(167,139,250,0.28);
+    font-family: "Mono"; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: #ddd6fe; }
+  .score { display: flex; justify-content: space-between; align-items: center; padding: 12px 36px;
+    border-bottom: 1px solid rgba(255,255,255,0.10); font-family: "Mono"; }
+  .score .num { font-size: 46px; font-weight: 800; color: #fff; }
+  .score .num.a { color: #ff8ec7; text-shadow: 0 0 20px rgba(255,142,199,0.45); }
+  .score .num.b { color: #7cc4ff; text-shadow: 0 0 20px rgba(124,196,255,0.45); }
+  .score .lbl { font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
 
-  .card { position: absolute; left: 26px; width: 558px; height: 108px; background: #fff; border: 5px solid #14101f;
-    border-radius: 14px; box-shadow: 6px 6px 0 #14101f; padding: 10px 16px; box-sizing: border-box;
-    font-family: "NotoSC"; transform-origin: 50% 50%; }
-  .card .top { display: flex; align-items: center; gap: 10px; font-weight: 900; font-size: 20px; }
-  .tag { padding: 2px 10px; border-radius: 6px; border: 3px solid #14101f; font-family: "Bangers"; font-size: 20px; }
-  .tag.A { background: #ffb5d8; color: #14101f; } .tag.B { background: #a8d8ff; color: #14101f; }
-  .tag.sev { background: #ff4d5e; color: #fff; }
-  .card .ttl { margin-top: 6px; font-size: 22px; font-weight: 800; color: #14101f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .card.dup { background: #ffe4e8; border-color: #d41c3c; }
-
-  /* 红色拦截印章 */
-  #stamp { position: absolute; left: 720px; top: 470px; width: 480px; padding: 16px 22px; border: 9px solid #d41c3c;
-    border-radius: 18px; background: rgba(255, 245, 245, 0.96); color: #d41c3c; text-align: center;
-    font-family: "HuangYou"; z-index: 60; box-shadow: 10px 10px 0 #14101f; transform-origin: 50% 50%; }
-  #stamp .big { font-size: 68px; line-height: 1.05; }
-  #stamp .sub { font-family: "Bangers"; font-size: 28px; letter-spacing: 2px; margin-top: 4px; color: #14101f; }
-
-  /* 一胜横幅 */
-  #win { position: absolute; left: 50%; top: 440px; width: 1080px; margin-left: -540px; padding: 24px 40px;
-    background: linear-gradient(90deg, #ffe14d, #ff9ad5, #ffe14d); border: 8px solid #14101f; border-radius: 26px;
-    box-shadow: 14px 14px 0 #14101f; text-align: center; z-index: 80; transform-origin: 50% 50%; white-space: nowrap; }
-  #win .zh { font-family: "KuaiLe"; font-size: 82px; color: #14101f; -webkit-text-stroke: 3px #fff; }
-  #win .en { font-family: "Bangers"; font-size: 38px; letter-spacing: 3px; color: #261b47; }
+  .card { position: absolute; left: 22px; width: 556px; height: 84px; background: rgba(20, 23, 42, 0.92);
+    border: 1px solid rgba(255,255,255,0.12); border-left: 3px solid #ff7ab8; padding: 11px 18px;
+    box-sizing: border-box; font-family: "Mono"; }
+  .card.B { border-left-color: #6eb8ff; }
+  .card.dup { background: rgba(70, 14, 28, 0.92); border-color: #ff4d6d; border-left: 4px solid #ff4d6d; }
+  .card .top { display: flex; justify-content: space-between; font-size: 12px; letter-spacing: 1.5px; color: rgba(220,228,255,0.65); }
+  .card .ttl { font-family: "SansSC"; font-weight: 800; font-size: 20px; color: #f4f6ff; margin-top: 5px; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
 <script src="../../data/voice.js"></script>
-<script src="../../data/demo_channel.js"></script>
 </head>
 <body>
 <div id="stage">
   <div id="root">
     <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
-    <div class="code-win" id="winL" style="left:26px">
-      <div class="bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>src/session.py · 哈基米 A</div>
+    <div class="grid"></div>
+    <div class="bg-type" style="left:30px;top:90px">ROUND_01</div>
+
+    <div class="code-win" style="left:40px">
+      <div class="bar"><span>src/session.py</span><span style="color:#ff9ed2">SCANNER // AGENT_A</span></div>
       <pre>
 <span class="ln">38</span><span class="kw">def</span> <span class="fn">load_profile</span>(req):
 <span class="ln">39</span>    tok = req.headers.get(<span class="str">"Auth"</span>)
 <span class="ln">40</span>    user = <span class="fn">get_current_user</span>(tok)
-<span class="ln">41</span>    <span class="kw"># forgot null check!</span>
+<span class="ln">41</span>    <span class="cm"># user may be None when token expires</span>
 <span class="ln">42</span>    uid = user.id
 <span class="ln">43</span>    role = user.role.strip()
 <span class="ln">44</span>    <span class="kw">return</span> db.<span class="fn">query</span>(uid, role)
@@ -80,103 +66,120 @@
 <span class="ln">47</span>    left = <span class="kw">await</span> stock.<span class="fn">get</span>(oid)
 <span class="ln">48</span>    <span class="kw">if</span> left >= n:
 <span class="ln">49</span>        <span class="kw">await</span> stock.<span class="fn">set</span>(oid, left - n)</pre>
-      <div class="bug-hl" id="hlL1" style="top:196px;height:68px"></div>
-      <div class="bug-hl" id="hlL2" style="top:345px;height:100px"></div>
+      <div class="bug-hl" id="hlL1" style="top:172px;height:60px"></div>
+      <div class="bug-hl" id="hlL2" style="top:310px;height:86px"></div>
       <div class="scan" id="scanL"></div>
     </div>
 
-    <div class="code-win" id="winR" style="left:1284px">
-      <div class="bar"><span class="dot" style="background:#ff5f56"></span><span class="dot" style="background:#ffbd2e"></span><span class="dot" style="background:#27c93f"></span>src/db/pool.py · 哈基米 B</div>
+    <div class="code-win" style="left:1290px">
+      <div class="bar"><span>src/db/pool.py</span><span style="color:#93ccff">SCANNER // AGENT_B</span></div>
       <pre>
 <span class="ln">116</span><span class="kw">def</span> <span class="fn">run_tx</span>(sql, args):
 <span class="ln">117</span>    conn = pool.<span class="fn">acquire</span>()
 <span class="ln">118</span>    <span class="kw">if</span> conn.ping() <span class="kw">is False</span>:
 <span class="ln">119</span>        <span class="kw">raise</span> <span class="fn">TimeoutError</span>()
-<span class="ln">120</span>    <span class="kw"># leaked: conn never closed!</span>
+<span class="ln">120</span>    <span class="cm"># conn leaked on exception path</span>
 <span class="ln">121</span>    cur = conn.<span class="fn">cursor</span>()
 <span class="ln">122</span>    cur.<span class="fn">execute</span>(
 <span class="ln">123</span>        <span class="str">f"SELECT * ORDER BY {args}"</span>
 <span class="ln">124</span>    )
 <span class="ln">125</span>    <span class="kw">return</span> cur.<span class="fn">fetchall</span>()</pre>
-      <div class="bug-hl" id="hlR1" style="top:128px;height:100px"></div>
-      <div class="bug-hl" id="hlR2" style="top:262px;height:68px"></div>
+      <div class="bug-hl" id="hlR1" style="top:116px;height:86px"></div>
+      <div class="bug-hl" id="hlR2" style="top:240px;height:60px"></div>
       <div class="scan" id="scanR"></div>
     </div>
 
     <div id="chan">
-      <div class="hdr">哈气互动通道 · 防重计分板<span>HAKIMI-HISS-CHANNEL · DEDUP ENGINE</span></div>
+      <div class="hdr"><span>HAKIMI-HISS-CHANNEL // LIVE REGISTRY</span><span>DEDUP: ±5 LINES</span></div>
       <div class="score">
-        <div class="side"><span class="tag A">GEMINI A</span><span class="num" id="scA">0</span></div>
-        <div class="vs">VS</div>
-        <div class="side"><span class="num" id="scB">0</span><span class="tag B">GEMINI B</span></div>
+        <div><div class="lbl">AGENT_A (橘座)</div><div class="num a" id="scA">0</div></div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.35)">VS</div>
+        <div style="text-align:right"><div class="lbl">AGENT_B (狸花)</div><div class="num b" id="scB">0</div></div>
       </div>
       <div id="cards" style="position:relative"></div>
     </div>
-
-    <div id="stamp"><div class="big">哈——！慢了一爪！</div><div class="sub">REJECTED · DUPLICATE (±5 LINES)</div></div>
-    <div id="win"><div class="zh">🏆 哈基米 A · 夺得【一胜】！</div><div class="en">ROUND 1 WINNER · MOST VALID BUGS</div></div>
   </div>
+  <div class="vignette"></div>
   <div class="flash" id="flash"></div>
 </div>
 <script>
 const { tw, kf, ease, clamp, lerp, shake, onTwos } = K;
 const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
-const S = {}; ["S05", "S06", "S07", "S08", "S09", "S10"].forEach((id) => (S[id] = K.seg(id)));
+const S = {}; ["S05", "S06", "S07", "S08"].forEach((id) => (S[id] = K.seg(id)));
 
-const T0 = +(S.S05.end + 1.6).toFixed(3);
-const T1 = +(S.S10.start - 0.1).toFixed(3);
+const T0 = +(S.S05.start - 0.1).toFixed(3);
+const T1 = +(S.S08.start - 0.1).toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
-// 事件时点
 const E = {
-  c1: S.S06.start + 3.2,     // A 登记 BUG-001
-  c2: S.S06.start + 4.8,     // B 登记 BUG-002
-  spot: S.S07.start,         // “抓到了！空指针，第四十二行！”
-  c3: S.S07.start + 1.2,     // A 登记 BUG-003
-  dupTry: S.S08.start - 0.15,// B 试图重复登记 session.py:44
-  dupHit: S.S08.start + 0.25,// 红章砸下 “哈——！慢了一爪！”
-  c4: S.S09.start + 0.6,     // B 改报 BUG-004
-  c5: S.S09.start + 1.3,     // A 登记 BUG-005
-  win: S.S09.start + 2.0,    // 决出【一胜】
+  c1: S.S05.start + 1.2,      // A 抢先登记 BUG-001
+  c2: S.S05.start + 2.8,      // B 登记 BUG-002
+  c3: S.S06.start + 0.5,      // A 登记 BUG-003
+  dupTry: S.S06.start + 1.4,  // B 提交 session.py:44
+  dupHit: S.S06.start + 1.8,  // 系统立刻弹出防重通知，B 看到并念出 “系统弹窗说相近五行重复当场拦截？！”
+  c4: S.S07.start - 0.6,      // B 改报 BUG-004
+  c5: S.S07.start - 0.2,      // A 登记 BUG-005
+  win: S.S07.start + 1.0,     // 系统弹出【一胜】通告，A 看着通告得意念出 “看系统通告没？三比二，一胜归本喵！”
 };
 
 let G = {};
 window.__ready = (async () => {
-  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
-  await document.fonts.load('68px "HuangYou"'); await document.fonts.load('900 50px "NotoSC"');
-  const im = await K.loadImages({
-    inspect: A + "pose04.png", smug: A + "pose05.png", shock: A + "pose06.png", hissR: A + "pose02.png",
-  });
+  await document.fonts.load('900 80px "SerifSC"');
+  await document.fonts.load('900 32px "SansSC"');
+  await document.fonts.load('700 16px "Mono"');
+  const im = await K.loadImages({ inspect: A + "pose04.png", smug: A + "pose05.png", shock: A + "pose06.png" });
   build(im);
   await document.fonts.ready;
 })();
 
 function build(im) {
   const root = $("root");
-  G.cap = UI.caption(root, { x: 40, y: 26, zh: "第一局：哈气找 Bug 大赛（决出【一胜】）", en: "ROUND 1 · PARALLEL BUG HUNT & REAL-TIME DEDUP" });
-  // 左侧 A：先眯眼找，再比 V 得意
-  G.aInspect = UI.char(root, im.inspect, { x: 250, y: 1180, h: 680 });
-  G.aSmug = UI.char(root, im.smug, { x: 250, y: 1180, h: 680 });
-  // 右侧 B：先找（镜像 inspect），撞车后炸毛震惊
-  G.bInspect = UI.char(root, im.inspect, { x: 1670, y: 1180, h: 680 });
-  G.bShock = UI.char(root, im.shock, { x: 1670, y: 1180, h: 680 });
-  G.bL1 = UI.bubble(root, { x: 340, y: 580, w: 380, h: 160, zh: '<span style="font-size:36px">抓到了！L42 空指针！</span>', en: "GOT IT! LINE 42!", tail: [-50, 90] });
+  UI.hud(root, { left: "AGENT_A · 橘座 // HUNTING", mid: "PHASE: ROUND1_HUNTING · DEDUP ACTIVE", right: "AGENT_B · 狸花 // HUNTING" });
+
+  G.aInspect = UI.char(root, im.inspect, { x: 220, y: 1200, h: 680, cls: "glow-a" });
+  G.aSmug = UI.char(root, im.smug, { x: 220, y: 1200, h: 680, cls: "glow-a" });
+  G.bInspect = UI.char(root, im.inspect, { x: 1700, y: 1200, h: 680, cls: "glow-b" });
+  G.bShock = UI.char(root, im.shock, { x: 1700, y: 1200, h: 680, cls: "glow-b" });
+
+  G.bA1 = UI.polyBubble(root, {
+    x: 330, y: 695, w: 480, h: 155, who: "GEMINI_A // LOGGED FIRST", theme: "a", tailDir: "left",
+    zh: 'L42 空指针——<span class="hl-a">本喵先往通道里登上了！</span>', en: "LINE 42 NULL POINTER—LOGGED FIRST!",
+  });
+  G.bB1 = UI.polyBubble(root, {
+    x: 1060, y: 690, w: 540, h: 165, who: "GEMINI_B // READING INTERCEPT POPUP", theme: "b", tailDir: "right", spiky: true,
+    zh: '咦？！系统弹窗说<br><span class="hl-b">「相近五行的重复虫子当场拦截」？！</span>', en: "SYSTEM SAYS 'NEAR-LINE DUPLICATE BLOCKED ON SIGHT'?!",
+  });
+  G.bA2 = UI.polyBubble(root, {
+    x: 330, y: 690, w: 530, h: 165, who: "GEMINI_A // POINTING AT NOTICE", theme: "a", tailDir: "left", spiky: true,
+    zh: '哈——！慢了一爪！看系统通告没？<br><span class="hl-a">三比二，【一胜】归本喵了！</span>', en: "SEE THE SYSTEM NOTICE? 3 TO 2, ROUND 1 IS MINE!",
+  });
+
+  G.sysDup = UI.sysNotice(root, {
+    x: 590, y: 365, w: 740, code: "SYSTEM NOTICE // RULE 02: DEDUP INTERCEPT", badge: "REJECTED", kind: "warn",
+    zh: "【防重规则触发】src/session.py:44 与已登记 BUG-001（L42-48）处于 ±5 行内，当场拦截！",
+    en: "hakimi_report_bug -> accepted: false · reason: DUPLICATE (within ±5 lines of BUG-001)",
+  });
+  G.sysWin = UI.sysNotice(root, {
+    x: 560, y: 360, w: 800, code: "SYSTEM NOTICE // ROUND 1 SETTLEMENT", badge: "【一胜】", kind: "gold",
+    zh: "【第一局结算通告】有效 Bug 3 : 2，哈基米A 夺得【一胜】！通道挂起等待铲屎官",
+    en: "hakimi_settle_round1 -> round1_winner: A (3 vs 2 valid bugs) · status: SUSPENDED",
+  });
 
   const items = [
     { id: "BUG-001", who: "A", file: "src/session.py:42", ttl: "token 为空时直接解引用 user.id", t: E.c1 },
     { id: "BUG-002", who: "B", file: "src/db/pool.py:118", ttl: "异常分支未归还数据库连接", t: E.c2 },
     { id: "BUG-003", who: "A", file: "src/OrderService.ts:87", ttl: "并发扣减库存未加锁导致超卖", t: E.c3 },
-    { id: "DUP!", who: "B", file: "src/session.py:44", ttl: "user 为 None 时访问 user.id（±5行撞车！）", t: E.dupTry, dup: true },
+    { id: "REJECTED", who: "B", file: "src/session.py:44", ttl: "user 为 None 时访问 user.id（±5 行撞车）", t: E.dupTry, dup: true },
     { id: "BUG-004", who: "B", file: "src/api/search.py:31", ttl: "ORDER BY 直接拼接用户输入", t: E.c4 },
     { id: "BUG-005", who: "A", file: "src/worker/queue.go:203", ttl: "重试计数未递增导致死循环", t: E.c5 },
   ];
   G.cards = items.map((it, idx) => {
     const row = it.dup ? 3 : idx > 3 ? idx - 1 : idx;
-    const c = UI.el("div", "card" + (it.dup ? " dup" : ""), $("cards"),
-      `<div class="top"><span class="tag ${it.who}">GEMINI ${it.who}</span><span class="tag sev">${it.id}</span><span>${it.file}</span></div>` +
+    const c = UI.el("div", `card ${it.who}` + (it.dup ? " dup" : ""), $("cards"),
+      `<div class="top"><span>[${it.id}] // AGENT_${it.who}</span><span>${it.file}</span></div>` +
       `<div class="ttl">${it.ttl}</div>`);
-    c.style.top = 16 + row * 116 + "px";
+    c.style.top = 12 + row * 90 + "px";
     c._it = it;
     return c;
   });
@@ -184,68 +187,65 @@ function build(im) {
 
 function render(t) {
   const c = $("bg").getContext("2d");
-  K.rays(c, 1920, 1080, 960, 540, 32, t * 0.04, "#28204a", "#1b1533");
-  if (t >= E.dupHit && t < E.c4) {
-    K.focusLines(c, 1920, 1080, 960, 520, 360, 110, t, { color: "#ff3b5c", alpha: 0.35, seed: 9 });
-  }
+  c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
+  const g = c.createRadialGradient(960, 420, 40, 960, 420, 900);
+  g.addColorStop(0, t >= E.dupHit && t < E.c4 ? "rgba(255, 64, 104, 0.22)" : "rgba(139, 92, 246, 0.14)");
+  g.addColorStop(1, "rgba(7, 8, 17, 0)");
+  c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
 
-  const [sx, sy] = shake(t, E.dupHit, 0.45, 20);
-  const [sx2, sy2] = shake(t, E.win, 0.4, 14);
+  const [sx, sy] = shake(t, E.dupHit, 0.42, 18);
+  const [sx2, sy2] = shake(t, E.win, 0.35, 12);
   $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
-  UI.put(G.cap, { s: tw(t, T0 + 0.05, 0.35, ease.outBack), r: -1 });
-
-  // 扫描线与高亮
-  $("scanL").style.top = 60 + ((t * 220) % 640) + "px";
-  $("scanR").style.top = 60 + (((t + 1.1) * 220) % 640) + "px";
+  $("scanL").style.top = 50 + ((t * 210) % 520) + "px";
+  $("scanR").style.top = 50 + (((t + 1.1) * 210) % 520) + "px";
   $("hlL1").style.opacity = tw(t, E.c1 - 0.3, 0.25);
   $("hlR1").style.opacity = tw(t, E.c2 - 0.3, 0.25);
   $("hlL2").style.opacity = tw(t, E.c3 - 0.3, 0.25);
   $("hlR2").style.opacity = tw(t, E.c4 - 0.3, 0.25);
 
-  // 卡片飞入 & 计分
   let aCnt = 0, bCnt = 0;
   G.cards.forEach((card) => {
     const it = card._it;
     if (it.dup) {
       const pIn = tw(t, it.t, 0.22, ease.outBack);
-      const pOut = tw(t, E.c4 - 0.15, 0.25, ease.inQuad);
-      UI.put(card, { x: (1 - pIn) * 360 + pOut * 500, r: pOut * 18, o: clamp(pIn * 3) * (1 - pOut) });
+      const pOut = tw(t, E.c4 - 0.1, 0.25, ease.inQuad);
+      UI.put(card, { x: (1 - pIn) * 320 + pOut * 420, o: clamp(pIn * 3) * (1 - pOut) });
     } else {
-      const p = tw(t, it.t, 0.28, ease.outBack);
-      const fromX = it.who === "A" ? -380 : 380;
-      UI.put(card, { x: (1 - p) * fromX, s: p, o: clamp(p * 3) });
+      const p = tw(t, it.t, 0.26, ease.outBack);
+      UI.put(card, { x: (1 - p) * (it.who === "A" ? -320 : 320), s: p, o: clamp(p * 3) });
       if (t >= it.t + 0.1) { if (it.who === "A") aCnt++; else bCnt++; }
     }
   });
   $("scA").textContent = aCnt;
   $("scB").textContent = bCnt;
 
-  // 红章 “哈——！慢了一爪！”
-  const sp = tw(t, E.dupHit, 0.2, ease.outBack);
-  const sOut = tw(t, E.c4 - 0.1, 0.25);
-  UI.put($("stamp"), { s: lerp(2.8, 1, sp), r: -8, o: clamp(sp * 4) * (1 - sOut) });
+  const aSmugOn = t >= S.S07.start;
+  const bob = Math.sin(onTwos(t) * 5) * 5;
+  UI.put(G.aInspect, { y: bob, o: aSmugOn ? 0 : 1 });
+  UI.put(G.aSmug, { y: bob, s: aSmugOn ? tw(t, S.S07.start, 0.25, ease.outBack) : 0, o: aSmugOn ? 1 : 0 });
 
-  // 角色状态切换
-  const aWon = t >= E.dupHit;
-  const bob = Math.sin(onTwos(t) * 5) * 6;
-  UI.put(G.aInspect, { y: bob, o: aWon ? 0 : 1 });
-  UI.put(G.aSmug, { y: bob, s: aWon ? tw(t, E.dupHit, 0.25, ease.outBack) : 0, o: aWon ? 1 : 0 });
-  const bShocked = t >= E.dupHit && t < E.win + 0.5;
-  UI.put(G.bInspect, { sx: -1, y: -bob, o: bShocked ? 0 : 1 });
-  const jolt = bShocked ? Math.sin(onTwos(t, 24) * 30) * 8 : 0;
-  UI.put(G.bShock, { x: jolt, y: -Math.abs(jolt), o: bShocked ? 1 : 0 });
+  const bShockOn = t >= E.dupHit;
+  UI.put(G.bInspect, { sx: -1, y: -bob, o: bShockOn ? 0 : 1 });
+  const jolt = bShockOn && t < S.S07.start + 0.8 ? Math.sin(onTwos(t, 24) * 28) * 7 : 0;
+  UI.put(G.bShock, { x: jolt, o: bShockOn ? 1 : 0 });
 
-  const bp = tw(t, E.spot, 0.25, ease.outBack) * (1 - tw(t, E.dupTry, 0.2));
-  UI.put(G.bL1, { s: bp, o: clamp(bp * 3) });
+  const pBA1 = tw(t, S.S05.start + 0.3, 0.26, ease.outBack) * (1 - tw(t, S.S06.start, 0.2));
+  const pBB1 = tw(t, E.dupHit + 0.1, 0.26, ease.outBack) * (1 - tw(t, S.S07.start, 0.2));
+  const pBA2 = tw(t, S.S07.start, 0.26, ease.outBack);
+  UI.put(G.bA1, { s: pBA1, o: clamp(pBA1 * 3), r: -1 });
+  UI.put(G.bB1, { s: pBB1, o: clamp(pBB1 * 3), r: 1 });
+  UI.put(G.bA2, { s: pBA2, o: clamp(pBA2 * 3), r: -1.2 });
 
-  // 【一胜】横幅
-  const wp = tw(t, E.win, 0.35, ease.outBack);
-  UI.put($("win"), { s: wp, r: -1.5, o: clamp(wp * 3) });
+  const pDup = tw(t, E.dupHit, 0.22, ease.outBack) * (1 - tw(t, E.win - 0.15, 0.22));
+  UI.put(G.sysDup, { s: lerp(1.4, 1, pDup), o: clamp(pDup * 4) });
+
+  const pWin = tw(t, E.win, 0.28, ease.outBack);
+  UI.put(G.sysWin, { s: pWin, o: clamp(pWin * 3) });
 
   $("flash").style.opacity = Math.max(
-    kf(t, [[T0, 0.9], [T0 + 0.2, 0]]),
-    kf(t, [[E.dupHit - 0.01, 0], [E.dupHit, 0.75], [E.dupHit + 0.12, 0]])
+    kf(t, [[T0, 0.7], [T0 + 0.18, 0]]),
+    kf(t, [[E.dupHit - 0.01, 0], [E.dupHit, 0.65], [E.dupHit + 0.12, 0]])
   );
 }
 

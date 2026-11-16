@@ -2,31 +2,22 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>04-cta · 特性速览 & 片尾</title>
+<title>04-cta · 看见持久上下文系统通知 → 继续互哈 & 仓库卡片</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
-  #root { position: absolute; inset: 0; background: #140d2e; overflow: hidden; }
-  /* 四个特性徽章 */
-  .feat { position: absolute; width: 520px; height: 150px; background: #fff; border: 6px solid #14101f;
-    border-radius: 18px; box-shadow: 10px 10px 0 #14101f; padding: 16px 24px; box-sizing: border-box;
-    font-family: "NotoSC"; z-index: 25; }
-  .feat .t { font-family: "KuaiLe"; font-size: 36px; color: #14101f; }
-  .feat .s { font-size: 21px; font-weight: 800; color: #54487a; margin-top: 6px; }
-  .feat .e { font-family: "Bangers"; font-size: 20px; letter-spacing: 1.5px; color: #d4388d; margin-top: 4px; }
+  #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
 
-  /* 片尾主卡 */
-  #card { position: absolute; left: 110px; top: 150px; width: 1060px; height: 700px; background: rgba(25, 16, 56, 0.92);
-    border: 7px solid #ffe14d; border-radius: 28px; box-shadow: 16px 16px 0 #090518; padding: 36px 48px;
-    box-sizing: border-box; z-index: 30; color: #fff; font-family: "NotoSC"; }
-  #card .quote { font-family: "KuaiLe"; font-size: 54px; color: #ffe14d; text-shadow: 4px 4px 0 #14101f; }
-  #card .title { font-family: "KuaiLe"; font-size: 86px; margin-top: 10px;
-    background: linear-gradient(90deg, #fff, #ffb3e1, #9fd4ff); -webkit-background-clip: text; color: transparent;
-    filter: drop-shadow(4px 4px 0 #14101f); }
-  #card .en { font-family: "Bangers"; font-size: 42px; letter-spacing: 5px; color: #78e8ff; margin-top: -4px; }
-  #card .repo { display: inline-block; margin-top: 22px; padding: 10px 24px; background: #14101f; border: 4px solid #78e8ff;
-    border-radius: 14px; font-family: monospace; font-size: 28px; font-weight: 800; color: #fff; }
-  .prompt { margin-top: 14px; padding: 12px 20px; background: rgba(255, 255, 255, 0.1); border-left: 6px solid #ff7ab2;
-    border-radius: 10px; font-size: 23px; font-weight: 700; color: #f3ecff; }
+  #cta-card { position: absolute; left: 86px; top: 108px; width: 920px; padding: 34px 44px;
+    background: rgba(11, 13, 26, 0.90); backdrop-filter: blur(18px); border: 1px solid rgba(167,139,250,0.42);
+    box-shadow: 0 28px 70px rgba(0,0,0,0.85), 0 0 40px rgba(139,92,246,0.18); z-index: 25;
+    clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px)); }
+  #cta-card .k { font-family: "Mono"; font-size: 13px; letter-spacing: 3px; color: #c4b5fd; }
+  #cta-card .title { font-family: "SerifSC"; font-weight: 900; font-size: 72px; color: #fff; letter-spacing: 4px; margin-top: 6px; }
+  #cta-card .sub { font-family: "Mono"; font-weight: 700; font-size: 18px; letter-spacing: 4px; color: #ff8ec7; margin-top: 4px; }
+  #cta-card .quote { font-family: "SansSC"; font-weight: 800; font-size: 24px; color: rgba(236,240,255,0.88); margin-top: 18px;
+    padding-left: 16px; border-left: 3px solid #a78bfa; }
+  #cta-card .repo { display: inline-block; margin-top: 20px; padding: 10px 22px; background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(124,196,255,0.55); font-family: "Mono"; font-weight: 700; font-size: 22px; color: #93ccff; letter-spacing: 1px; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -36,87 +27,90 @@
 <div id="stage">
   <div id="root">
     <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
-    <div id="feats"></div>
-    <div id="card">
-      <div class="quote">“依旧两哈基米相互哈气就算审查了！”</div>
+    <div class="grid"></div>
+    <div class="bg-type" style="left:40px;bottom:80px">HAKIMI_HISS</div>
+
+    <div id="cta-card">
+      <div class="k">ANTIGRAVITY PLUGIN // STDIO MCP + SUBAGENT DUEL</div>
       <div class="title">哈基米哈气审查</div>
-      <div class="en">HAKIMI HISS DUEL · ANTIGRAVITY PLUGIN</div>
+      <div class="sub">HAKIMI HISS DUEL · V1.0</div>
+      <div class="quote">“依旧两哈基米（Gemini）相互哈气就算审查了”</div>
       <div class="repo">github.com/AOE20000/hakimi-hiss</div>
-      <div class="prompt">💬 “召唤两只哈基米对当前项目开启哈气找Bug大赛（决出一胜）”</div>
-      <div class="prompt">💬 “让哈基米A和B交叉修复对方找到的Bug（决出二胜，修坏的贴上啥子标记）”</div>
     </div>
   </div>
+  <div class="vignette"></div>
   <div class="flash" id="flash"></div>
 </div>
 <script>
-const { tw, kf, ease, clamp, lerp, onTwos, rng } = K;
+const { tw, kf, ease, clamp, lerp, onTwos } = K;
 const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
-const S = {}; ["S14", "S15", "S16"].forEach((id) => (S[id] = K.seg(id)));
+const S = {}; ["S11", "S12"].forEach((id) => (S[id] = K.seg(id)));
 
-const T0 = +(S.S14.start - 0.1).toFixed(3);
+const T0 = +(S.S11.start - 0.1).toFixed(3);
 const T1 = +window.VOICE.total.toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
-const E = {
-  cta: S.S15.start - 0.15,
-};
-
 let G = {};
 window.__ready = (async () => {
-  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
-  await document.fonts.load('900 50px "NotoSC"');
-  const im = await K.loadImages({ wink: A + "pose10.png", hissL: A + "pose03.png", hissR: A + "pose02.png" });
+  await document.fonts.load('900 80px "SerifSC"');
+  await document.fonts.load('900 32px "SansSC"');
+  await document.fonts.load('700 16px "Mono"');
+  const im = await K.loadImages({ wink: A + "pose10.png", hissL: A + "pose03.png" });
   build(im);
   await document.fonts.ready;
 })();
 
 function build(im) {
   const root = $("root");
-  const fs = [
-    { x: 140, y: 180, t: "🧠 长期上下文保持", s: "持久化 conversationId，复审重修不断片", e: "PERSISTENT SUBAGENT MEMORY" },
-    { x: 700, y: 180, t: "⚡ 双 Worktree 隔离", s: "真并行修复 + 原子合并，自动降级波次乒乓", e: "PARALLEL GIT WORKTREES" },
-    { x: 140, y: 370, t: "🛡️ 实时防重通道", s: "同文件 ±5 行与相似描述当场拦截", e: "ZERO-DEPENDENCY STDIO MCP" },
-    { x: 700, y: 370, t: "🔄 随时手动重置", s: "一键洗牌重新开局，支持文件级或全项目审查", e: "INSTANT ARENA RESET" },
-  ];
-  G.feats = fs.map((f) => {
-    const d = UI.el("div", "feat", $("feats"), `<div class="t">${f.t}</div><div class="s">${f.s}</div><div class="e">${f.e}</div>`);
-    d.style.left = f.x + "px"; d.style.top = f.y + "px";
-    return d;
+  UI.hud(root, { left: "AGENT_A · 橘座 // SESSION PERSISTED", mid: "CONVERSATION_ID BOUND · READY FOR RE-REVIEW", right: "AGENT_B · 狸花 // 【啥子】" });
+
+  G.aWink = UI.char(root, im.wink, { x: 1280, y: 1230, h: 980, cls: "glow-a" });
+  G.bHiss = UI.char(root, im.hissL, { x: 1680, y: 1230, h: 940, cls: "glow-b" });
+
+  // 右下角系统规则通知 05：持久上下文与啥子重修（A 指着它念 S11）
+  G.sysMem = UI.sysNotice(root, {
+    x: 86, y: 520, w: 920, code: "SYSTEM NOTICE // RULE 06: PERSISTENT CONTEXT & RE-FIX", badge: "KEEP-ALIVE", kind: "ok",
+    zh: "【长期上下文保持】已持久化保存 A/B 的 conversationId，带【啥子】标记的 Bug 随时唤醒复审或重修（支持 hakimi_reset 重置）",
+    en: "send_message -> wakes identical A/B instances with full memory · 【啥子】 stays queued until fixed",
   });
-  G.wink = UI.char(root, im.wink, { x: 1540, y: 1260, h: 1120 });
+
+  G.bA11 = UI.polyBubble(root, {
+    x: 1020, y: 110, w: 540, h: 175, who: "GEMINI_A // POINTING AT KEEP-ALIVE NOTICE", theme: "a", tailDir: "bottom-left",
+    zh: '看通知——「上下文长期保持，<br><span class="hl-a">啥子随时拉出来重修」</span>！还不快改！',
+    en: "READ THE NOTICE—CONTEXT PERSISTS FOR RE-FIX! GET TO WORK!",
+  });
+  G.bB12 = UI.polyBubble(root, {
+    x: 1260, y: 310, w: 560, h: 175, who: "GEMINI_B // REMATCH!", theme: "b", tailDir: "bottom-right", spiky: true,
+    zh: '本喵才不是啥子！<br><span class="hl-b">等我重修完再跟你哈过！哈——！</span>',
+    en: "I'M NOT A DUMMY! WAIT TILL I RE-FIX THIS AND HISS YOU AGAIN!",
+  });
 }
 
 function render(t) {
   const c = $("bg").getContext("2d");
-  const g = c.createRadialGradient(1400, 460, 60, 960, 540, 1300);
-  g.addColorStop(0, "#5e3eb8"); g.addColorStop(0.55, "#27185c"); g.addColorStop(1, "#100826");
+  c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
+  let g = c.createRadialGradient(1380, 480, 40, 1380, 480, 820);
+  g.addColorStop(0, "rgba(167, 139, 250, 0.24)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
   c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
-  c.save(); c.globalAlpha = 0.12; K.rays(c, 1920, 1080, 1520, 480, 26, t * 0.06, "#fff", "rgba(0,0,0,0)"); c.restore();
-  const r = rng(77);
-  for (let i = 0; i < 36; i++) {
-    const x = r() * 1920, y = r() * 1080, sz = 8 + r() * 24, ph = r() * 6.28;
-    K.sparkle(c, x, y, sz * (0.4 + 0.6 * Math.abs(Math.sin(onTwos(t) * 3 + ph))), 0, i % 2 ? "#ffe14d" : "#fff", null);
-  }
 
-  const inCta = t >= E.cta;
-  G.feats.forEach((d, i) => {
-    const p = tw(t, T0 + 0.15 + i * 0.18, 0.35, ease.outBack);
-    const out = tw(t, E.cta - 0.1, 0.25);
-    UI.put(d, { s: p * (1 - out * 0.3), o: clamp(p * 3) * (1 - out), r: (i % 2 ? 1.5 : -1.5) });
-  });
+  const pc = tw(t, T0 + 0.1, 0.35, ease.outBack);
+  UI.put($("cta-card"), { x: (1 - pc) * -120, s: pc, o: clamp(pc * 3) });
 
-  const cp = tw(t, E.cta, 0.4, ease.outBack);
-  UI.put($("card"), { x: (1 - cp) * -200, s: cp, o: clamp(cp * 3) });
+  const pm = tw(t, T0 + 0.2, 0.32, ease.outBack);
+  UI.put(G.sysMem, { y: (1 - pm) * 40, s: pm, o: clamp(pm * 3) });
 
-  const wp = tw(t, T0 + 0.1, 0.5, ease.outCubic);
-  const bob = Math.sin(onTwos(t) * 4) * 8;
-  UI.put(G.wink, { x: (1 - wp) * 300, y: bob });
+  const bob = Math.sin(onTwos(t) * 4) * 6;
+  UI.put(G.aWink, { y: bob });
+  const pb = tw(t, S.S12.start - 0.15, 0.28, ease.outBack);
+  UI.put(G.bHiss, { x: (1 - pb) * 220, s: pb, y: -bob, o: clamp(pb * 3) });
 
-  $("flash").style.opacity = Math.max(
-    kf(t, [[T0, 0.85], [T0 + 0.2, 0]]),
-    kf(t, [[E.cta - 0.02, 0], [E.cta + 0.04, 0.75], [E.cta + 0.2, 0]])
-  );
+  const pA11 = tw(t, S.S11.start + 0.1, 0.28, ease.outBack);
+  const pB12 = tw(t, S.S12.start, 0.26, ease.outBack);
+  UI.put(G.bA11, { s: pA11, o: clamp(pA11 * 3), r: -1.2 });
+  UI.put(G.bB12, { s: pB12, o: clamp(pB12 * 3), r: 1.5 });
+
+  $("flash").style.opacity = kf(t, [[T0, 0.7], [T0 + 0.18, 0]]);
 }
 
 window.__seek = async (t) => { render(t); };

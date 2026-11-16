@@ -1,75 +1,75 @@
-"""旁白与对白稿（中文配音 + 中英双语字幕）。
-
-每条：
-  id      段号
-  who     发声者：nar = 旁白，gem = Gemini（哈基米），duo = 两只同时
-  zh      显示用中文（字幕）
-  en      显示用英文（字幕）
-  tts     送进 TTS 的文本（可为多音字/英文词做替换；None 表示同 zh）
-  gap     段后停顿（秒）
-
-时间轴不在这里写死：voice/build_voice.py 先合成每段，再按实际时长 + gap
-排出 data/voice.json，镜头页面和音效表都读它。
+"""双猫第一人称对白稿：
+无旁白；A 与 B 事先不知道规则，但能实时看到屏幕上弹出的【系统通知】，并当场念出/吐槽通知里的规则。
 """
 
-LEAD = 0.6   # 片头留白
-TAIL = 2.5   # 片尾留白
+LEAD = 0.55
+TAIL = 2.6
 
 SEGS = [
-    # ── 场 1：过度自信（M1 短段）──
-    dict(id="S01", who="nar", zh="Gemini 过度自信怎么办？",
-         en="What do you do when Gemini gets overconfident?",
-         tts=None, gap=0.35),
-    dict(id="S02", who="gem", zh="我的观察力太敏锐了！直接把病根切出来了！",
-         en="My eye is razor-sharp! I cut the root cause right out!",
-         tts=None, gap=0.45),
-    # ── 场 2：两哈基米对峙（M1 短段）──
-    dict(id="S03", who="nar", zh="简单。再召唤一只 Gemini，让它俩互相哈气。",
-         en="Easy. Summon a second Gemini and let them hiss at each other.",
-         tts=None, gap=0.25),
-    dict(id="S04", who="duo", zh="哈——！！", en="HISSSS!!",
-         tts="哈！", gap=0.55),
-    dict(id="S05", who="nar", zh="这就是，哈基米哈气审查。",
-         en="This is Hakimi Hiss Duel.",
-         tts=None, gap=0.8),
-    # ── 场 3：第一局 ──
-    dict(id="S06", who="nar", zh="第一局，哈气找 Bug。两只哈基米同时潜入代码库，每抓到一只虫子，就在通道里登记。",
-         en="Round one: the bug hunt. Both dive into the codebase and register every bug they catch.",
-         tts=None, gap=0.3),
-    dict(id="S07", who="gem", zh="抓到了！空指针，第四十二行！",
-         en="Got one! Null pointer, line forty-two!",
-         tts=None, gap=0.3),
-    dict(id="S08", who="gem", zh="哈——！慢了一爪！这只虫子已经被我叼走了！",
-         en="Hiss! Too slow by a paw! I already snatched that one!",
-         tts=None, gap=0.3),
-    dict(id="S09", who="nar", zh="重复登记，当场拦截。抓得多的，拿下一胜。",
-         en="Duplicates are blocked on the spot. Most bugs takes round one.",
-         tts=None, gap=0.7),
-    # ── 场 4：第二局 ──
-    dict(id="S10", who="nar", zh="第二局，交叉修复。你修我的 Bug，我修你的 Bug，各自在独立的工作树里并行开工。",
-         en="Round two: cross-fixing. Each fixes the other's bugs, in parallel, in isolated worktrees.",
-         tts=None, gap=0.3),
-    dict(id="S11", who="gem", zh="这也叫修好了？打回重修！",
-         en="You call that fixed? Rejected. Do it again!",
-         tts=None, gap=0.3),
-    dict(id="S12", who="nar", zh="互哈互验之后，由铲屎官亲自裁决。修得更完美的，拿下二胜。",
-         en="After mutual hiss-checks, the human makes the final call. The cleaner fix takes round two.",
-         tts=None, gap=0.4),
-    # ── 场 5：啥子 ──
-    dict(id="S13", who="nar", zh="修坏了的？贴上「啥子」。",
-         en="Botched it? Branded \"Dummy\".",
-         tts=None, gap=0.6),
-    # ── 场 6：收尾 ──
-    dict(id="S14", who="nar", zh="上下文长期保持，随时复审、重修。",
-         en="Context persists, so re-reviews and re-fixes are always on call.",
-         tts=None, gap=0.4),
-    dict(id="S15", who="gem", zh="依旧两哈基米相互哈气，就算审查了！",
-         en="Two Geminis hissing at each other: that counts as code review!",
-         tts=None, gap=0.5),
-    dict(id="S16", who="nar", zh="哈基米哈气审查，Antigravity 插件。",
-         en="Hakimi Hiss Duel. A plugin for Antigravity.",
-         tts=None, gap=0.0),
-]
+    # ── 01-hook：A 第一人称自吹 → 看到系统通知召唤 B → 站立哈气 ──
+    dict(id="S01", who="A",
+         zh="我是 Gemini。讲真，我的观察力实在太敏锐了——扫一眼代码，直接把病根切出来！",
+         en="I'm Gemini. Honestly, my eye is razor-sharp—one glance and I cut the root cause right out!",
+         tts="我是 Gemini。讲真，我的观察力实在太敏锐了，扫一眼代码，直接把病根切出来！",
+         gap=0.50),
+    dict(id="S02", who="A",
+         zh="等等，这系统通知写的啥……「开启双子哈气对抗审查」？！喂，对面那只怎么跟本喵长得一模一样？！",
+         en="Wait, what's this system notice—'Dual-Agent Hiss Review Activated'?! Hey, why does she look just like me?!",
+         tts="等等，这系统通知写的啥，开启双子哈气对抗审查？喂，对面那只怎么跟本喵长得一模一样？",
+         gap=0.26),
+    dict(id="S03", who="B",
+         zh="本喵也收到通知了！上面说抓虫多的拿「一胜」——少废话，这库的虫子全归我！",
+         en="I got the notice too! It says most bugs takes 'Round One'—save it, every bug here is mine!",
+         tts="本喵也收到通知了！上面说抓虫多的拿一胜，少废话，这库的虫子全归我！",
+         gap=0.22),
+    dict(id="S04", who="AB",
+         zh="哈——！！",
+         en="HISSSS!!",
+         tts="哈！", gap=1.30),
 
-# M1 短段只用到这些
-M1_IDS = ["S01", "S02", "S03", "S04", "S05"]
+    # ── 02-round1：抢虫子 → B 看到系统防重通知炸毛 → A 看着一胜通知得意 ──
+    dict(id="S05", who="A",
+         zh="看好了！第四十二行，空指针解引用——本喵先往通道里登上了！",
+         en="Watch this! Line forty-two, null pointer dereference—logged in the channel first!",
+         tts="看好了！第四十二行，空指针解引用，本喵先往通道里登上了！",
+         gap=0.40),
+    dict(id="S06", who="B",
+         zh="我也看到了，第四十四行……咦？！系统弹窗说「相近五行的重复虫子当场拦截」？！",
+         en="I saw it too, line forty-four... Huh?! The system notice says 'Near-line duplicate blocked on sight'?!",
+         tts="我也看到了，第四十四行，咦？系统弹窗说，相近五行的重复虫子当场拦截？",
+         gap=0.32),
+    dict(id="S07", who="A",
+         zh="哈——！慢了一爪！看系统通告没？三比二，这局「一胜」归本喵了！",
+         en="Hiss! Too slow by a paw! See the system notice? Three to two—'Round One' goes to me!",
+         tts="哈——！慢了一爪！看系统通告没？三比二，这局一胜归本喵了！",
+         gap=1.15),
+
+    # ── 03-round2：看到第二局交叉修复通知 → A 发打回通知 → B 看到【啥子】通知破防 ──
+    dict(id="S08", who="B",
+         zh="又弹新通知了……「第二局：隔离工作树交叉修复，互修对方的虫子」？！行，套个 try-except 糊弄过去！",
+         en="Another notice... 'Round Two: Cross-fix each other's bugs in isolated worktrees'?! Fine, I'll slap a try-except on it!",
+         tts="又弹新通知了，第二局：隔离工作树交叉修复，互修对方的虫子？行，套个 try except 糊弄过去！",
+         gap=0.40),
+    dict(id="S09", who="A",
+         zh="喂！系统刚提示轮到本喵「互哈互验」——你拿个空 except 吞异常也敢交？哈——！点驳回，打回重修！",
+         en="Hey! The system just prompted me to 'Hiss-Verify'—you dare submit a bare except?! Hiss! Clicking REJECT!",
+         tts="喂！系统刚提示轮到本喵互哈互验，你拿个空 except 吞异常也敢交？哈！点驳回，打回重修！",
+         gap=0.50),
+    dict(id="S10", who="B",
+         zh="呜……终审通知出来了，判你拿「二胜」，居然给本喵贴了个「啥子」标记？！",
+         en="Ugh... the final verdict notice is out: you get 'Round Two', and it branded me with a 'DUMMY' tag?!",
+         tts="呜，终审通知出来了，判你拿二胜，居然给本喵贴了个啥子标记？",
+         gap=1.05),
+
+    # ── 04-cta：看到持久上下文通知，继续互哈 ──
+    dict(id="S11", who="A",
+         zh="自己看右下角通知——「上下文长期保持，啥子标记随时拉出来复审重修」！还不快改！",
+         en="Read the notice in the corner—'Context persists, Dummies can be re-reviewed and re-fixed anytime'! Get to work!",
+         tts="自己看右下角通知，上下文长期保持，啥子标记随时拉出来复审重修！还不快改！",
+         gap=0.28),
+    dict(id="S12", who="B",
+         zh="本喵才不是啥子！等我重修完再跟你哈过！哈——！",
+         en="I'm NOT a dummy! Wait till I re-fix this and hiss you again! Hiss!",
+         tts="本喵才不是啥子！等我重修完再跟你哈过！哈！",
+         gap=0.0),
+]

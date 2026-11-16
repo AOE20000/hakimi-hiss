@@ -2,22 +2,20 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>01-hook · 过度自信 → 两哈基米对峙 → 片名</title>
+<title>01-hook · 哈基米A自吹 → 看见系统通知召唤B → 站立哈气对峙</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
-  #page { position: absolute; left: 0; top: 0; width: 1920px; height: 2200px; transform-origin: 0 0; background: #f4f1ea; }
-  #title { position: absolute; inset: 0; z-index: 500; visibility: hidden; overflow: hidden; }
-  #title .name { position: absolute; left: 0; right: 0; top: 180px; text-align: center; font-family: "KuaiLe"; font-size: 176px;
-    white-space: nowrap; letter-spacing: 6px; z-index: 30; }
-  #title .name span { display: inline-block; transform-origin: 50% 80%;
-    background: linear-gradient(180deg, #fff6ff 0%, #ffb3e1 38%, #b18cff 70%, #6fb6ff 100%); -webkit-background-clip: text;
-    color: transparent; filter: drop-shadow(0 0 0 #fff) drop-shadow(0 8px 0 #14101f) drop-shadow(0 -3px 0 #14101f)
-      drop-shadow(6px 0 0 #14101f) drop-shadow(-6px 0 0 #14101f); }
-  #title .en { position: absolute; left: 0; right: 0; top: 410px; text-align: center; font-family: "Bangers"; font-size: 92px;
-    letter-spacing: 10px; color: #ffe14d; -webkit-text-stroke: 8px #14101f; paint-order: stroke fill; z-index: 30; }
-  #title .tag { position: absolute; left: 50%; top: 535px; transform: translateX(-50%); padding: 8px 28px;
-    background: #14101f; border: 4px solid #ffe14d; border-radius: 40px; font-family: "NotoSC"; font-weight: 800;
-    font-size: 30px; color: #fff; letter-spacing: 2px; z-index: 30; white-space: nowrap; }
+  #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
+  .slash { position: absolute; left: 50%; top: -100px; width: 2px; height: 1280px;
+    background: linear-gradient(180deg, transparent, #fff 22%, #a78bfa 50%, #fff 78%, transparent);
+    transform: translateX(-50%) rotate(-9deg); box-shadow: 0 0 32px #a78bfa, 0 0 70px rgba(167,139,250,0.65); z-index: 30; }
+
+  #title-bar { position: absolute; left: 50%; top: 430px; width: 920px; margin-left: -460px; padding: 22px 36px;
+    background: rgba(9, 11, 22, 0.94); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.22);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.85), 0 0 50px rgba(167,139,250,0.35); text-align: center; z-index: 200;
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px)); }
+  #title-bar .zh { font-family: "SerifSC"; font-weight: 900; font-size: 76px; letter-spacing: 6px; color: #fff; }
+  #title-bar .en { font-family: "Mono"; font-weight: 800; font-size: 18px; letter-spacing: 8px; color: #c4b5fd; margin-top: 6px; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -25,200 +23,163 @@
 </head>
 <body>
 <div id="stage">
-  <div id="page">
-    <div class="panel" id="p1" style="left:0;top:0;width:1920px;height:1080px"><canvas class="abs" id="c1" width="1920" height="1080"></canvas><div class="frame"></div></div>
-    <div class="panel" id="p2" style="left:0;top:1120px;width:1920px;height:1080px"><canvas class="abs" id="c2" width="1920" height="1080"></canvas><canvas class="abs" id="c2f" width="1920" height="1080" style="z-index:44"></canvas><div class="frame"></div></div>
+  <div id="root">
+    <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
+    <div class="grid"></div>
+    <div class="bg-type" id="bgT1" style="left:40px;top:90px">OVERCONFIDENT</div>
+    <div class="bg-type" id="bgT2" style="right:40px;bottom:80px">ADVERSARIAL</div>
+    <div class="slash" id="slash"></div>
+    <div id="title-bar"><div class="zh">哈基米哈气审查</div><div class="en">HAKIMI HISS DUEL // ADVERSARIAL SUB-AGENT REVIEW</div></div>
   </div>
-  <div id="title"><canvas class="abs" id="c3" width="1920" height="1080"></canvas></div>
+  <div class="vignette"></div>
   <div class="flash" id="flash"></div>
 </div>
 <script>
-const { tw, kf, ease, clamp, lerp, shake, onTwos, hash, rng } = K;
+const { tw, kf, ease, clamp, lerp, shake, onTwos } = K;
 const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
-
 const S = {}; ["S01", "S02", "S03", "S04", "S05"].forEach((id) => (S[id] = K.seg(id)));
+
 const T = {
-  cap1: S.S01.start - 0.15,
-  b1: S.S02.start,
-  b2: S.S02.start + (S.S02.end - S.S02.start) * 0.47,
-  pan: S.S03.start - 0.25,
-  summon: S.S03.start + (S.S03.end - S.S03.start) * 0.42,
+  b1: S.S01.start + 0.2,
+  b2: S.S01.start + 2.7,
+  rule1: S.S02.start - 0.35,   // 系统通知先叮一声弹出，A 看到后开口念 S02
+  split: S.S02.start + 1.5,    // B 随系统通知召唤进场
+  b3: S.S02.start + 0.2,
+  b4: S.S03.start,
   hiss: S.S04.start,
-  title: S.S05.start - 0.2,
+  title: S.S04.end + 0.12,
 };
-window.SHOT = { start: 0, end: +(S.S05.end + 1.6).toFixed(3) };
+window.SHOT = { start: 0, end: +(S.S05.start - 0.1).toFixed(3) };
 
 let G = {};
 window.__ready = (async () => {
-  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
-  await document.fonts.load('220px "HuangYou"'); await document.fonts.load('900 50px "NotoSC"');
+  await document.fonts.load('900 80px "SerifSC"');
+  await document.fonts.load('900 32px "SansSC"');
+  await document.fonts.load('700 16px "Mono"');
   const im = await K.loadImages({ proud: A + "pose01.png", hissR: A + "pose02.png", hissL: A + "pose03.png" });
   build(im);
   await document.fonts.ready;
 })();
 
 function build(im) {
-  const p1 = $("p1"), p2 = $("p2");
-  // ── 第一格：自信（半身放大，构图更像图一上格）──
-  G.proud = UI.char(p1, im.proud, { x: 690, y: 1460, h: 1440 });
-  G.cap1 = UI.caption(p1, { x: 52, y: 44, zh: "1. Gemini 过度自信怎么办？", en: "WHEN GEMINI GETS OVERCONFIDENT" });
-  G.bubbles = [
-    UI.bubble(p1, { x: 1090, y: 50, w: 620, h: 240, zh: '我的观察力<br><span class="hl">太敏锐了！</span>', en: "MY EYE IS RAZOR-SHARP!", tail: [-70, 200] }),
-    UI.bubble(p1, { x: 1250, y: 300, w: 600, h: 235, zh: '直接把<br><span class="hl">病根切出来了！</span>', en: "CUT THE ROOT CAUSE RIGHT OUT!", tail: [-190, 120] }),
-    UI.bubble(p1, { x: 1070, y: 545, w: 510, h: 205, zh: '我的直觉<br><span class="hl">极其敏锐！</span>', en: "MY INSTINCTS ARE FLAWLESS!", tail: [-90, 20] }),
-    UI.bubble(p1, { x: 1545, y: 590, w: 340, h: 170, zh: '太精彩了！', en: "BRILLIANT!", tail: [-120, -20], shape: "spiky" }),
-  ];
-  G.crowd = [
-    UI.bubble(p1, { x: 40, y: 440, w: 250, h: 150, zh: '<span style="font-size:32px">哇—好厉害！</span>', en: "WOW!", tail: [150, 220] }),
-    UI.bubble(p1, { x: 250, y: 555, w: 200, h: 110, zh: '<span style="font-size:28px">太强了…</span>', en: "SO STRONG…", tail: [60, 180] }),
-  ];
-  // ── 第二格：站立对峙哈气 ──
-  G.cap2 = UI.caption(p2, { x: 52, y: 44, zh: "2. 对抗性子代理审查", en: "ADVERSARIAL SUB-AGENT REVIEW", cls: "blue" });
-  G.L = UI.char(p2, im.hissR, { x: 540, y: 1280, h: 1080 });
-  G.R = UI.char(p2, im.hissL, { x: 1380, y: 1280, h: 1080 });
-  G.sfxL = UI.sfx(p2, { x: 110, y: 170, zh: "哈——!!", en: "HISS!!", size: 175, color: "#1a1030", glow: "#ff6fae" });
-  G.sfxR = UI.sfx(p2, { x: 1250, y: 70, zh: "哈——!!", en: "HISS!!", size: 175, color: "#13234f", glow: "#5fb8ff" });
-  // ── 片名 ──
-  const name = UI.el("div", "name", $("title"));
-  G.nameChars = [..."哈基米哈气审查"].map((ch) => UI.el("span", "", name, ch));
-  G.nameEn = UI.el("div", "en", $("title"), "HAKIMI HISS DUEL");
-  G.tag = UI.el("div", "tag", $("title"), "双子代理对抗审查 · 交叉修复 · 防重通道");
-  G.tL = UI.char($("title"), im.hissR, { x: 240, y: 1360, h: 980 });
-  G.tR = UI.char($("title"), im.hissL, { x: 1680, y: 1360, h: 980 });
+  const root = $("root");
+  UI.hud(root, { left: "AGENT_A · 橘座 // POV: 1ST-PERSON", mid: "HAKIMI-HISS-CHANNEL · SESSION #01", right: "AGENT_B · 狸花" });
+
+  G.proud = UI.char(root, im.proud, { x: 640, y: 1380, h: 1340, cls: "glow-a" });
+  G.bProud1 = UI.polyBubble(root, {
+    x: 980, y: 130, w: 620, h: 195, who: "GEMINI_A // SELF-ASSESSMENT", theme: "a", tailDir: "left",
+    zh: '讲真，我的观察力<span class="hl-a">实在太敏锐了！</span>', en: "HONESTLY, MY EYE IS RAZOR-SHARP!",
+  });
+  G.bProud2 = UI.polyBubble(root, {
+    x: 1080, y: 360, w: 660, h: 205, who: "GEMINI_A // CONFIDENCE: 99.9%", theme: "a", tailDir: "left", spiky: true,
+    zh: '扫一眼代码，<span class="hl-a">直接把病根切出来！</span>', en: "ONE GLANCE AND I CUT THE ROOT CAUSE RIGHT OUT!",
+  });
+  G.bCrowd1 = UI.polyBubble(root, {
+    x: 90, y: 420, w: 300, h: 130, who: "USER_LOG", theme: "v", tailDir: "right",
+    zh: '<span style="font-size:24px">哇—Argon 好厉害！</span>', en: "SO IMPRESSIVE...",
+  });
+
+  // 系统规则通知 1（A 与 B 都能看见并当场念出来）
+  G.rule1 = UI.sysNotice(root, {
+    x: 560, y: 92, w: 800, code: "SYSTEM NOTICE // RULE 01: DUAL-AGENT HISS REVIEW", badge: "ENFORCED",
+    zh: "【开启双子哈气对抗审查】已用同模型召唤哈基米B · 第一局抓虫多者获【一胜】",
+    en: "Spawning identical Gemini Subagent B · Round 1 Rule: Most valid bugs takes [Round 1 Win]",
+  });
+
+  G.L = UI.char(root, im.hissR, { x: 450, y: 1250, h: 1080, cls: "glow-a" });
+  G.R = UI.char(root, im.hissL, { x: 1470, y: 1250, h: 1080, cls: "glow-b" });
+
+  G.bWait = UI.polyBubble(root, {
+    x: 410, y: 265, w: 560, h: 190, who: "GEMINI_A // READING SYSTEM NOTICE", theme: "a", tailDir: "bottom-left",
+    zh: '这系统通知写的啥……「双子哈气审查」？！<br>对面那只怎么<span class="hl-a">跟本喵一模一样？！</span>',
+    en: "'DUAL HISS REVIEW'?! WHY DOES SHE LOOK JUST LIKE ME?!",
+  });
+  G.bTaunt = UI.polyBubble(root, {
+    x: 960, y: 290, w: 560, h: 190, who: "GEMINI_B // READING SYSTEM NOTICE", theme: "b", tailDir: "bottom-right", spiky: true,
+    zh: '本喵也收到通知了！抓虫多的拿<span class="hl-b">【一胜】</span>——<br>这库的虫子全归我！',
+    en: "GOT THE NOTICE TOO! MOST BUGS TAKES ROUND 1—ALL MINE!",
+  });
+
+  G.sfxL = UI.sfxSerif(root, { x: 86, y: 110, zh: "哈——！", sub: "HISS // SUBAGENT_A", subColor: "#ff8ec7", align: "left" });
+  G.sfxR = UI.sfxSerif(root, { x: 1330, y: 110, zh: "哈——！", sub: "HISS // SUBAGENT_B", subColor: "#7cc4ff", align: "right" });
 }
 
-function drawP1(t) {
-  const c = $("c1").getContext("2d");
-  K.rays(c, 1920, 1080, 690, 420, 28, t * 0.05, "#ffe7a3", "#fff4d6");
-  K.halftone(c, 0, 0, 1920, 1080, 26, 9, "rgba(240,170,60,0.35)", (u, v) => clamp(Math.hypot(u - 0.36, (v - 0.4) * 0.56) * 2.2 - 0.55));
-  const r = rng(7);
-  for (let i = 0; i < 16; i++) {
-    const x = 180 + r() * 1050, y = 70 + r() * 680, sz = 18 + r() * 34, ph = r() * 6.28;
-    const k = 0.55 + 0.45 * Math.sin(onTwos(t) * 5 + ph);
-    K.sparkle(c, x, y, sz * k, 0, "#ffd23f", "#fff");
-  }
-  for (let i = 0; i < 4; i++) {
-    const x = 70 + i * 92, y = 760 + (i % 2) * 36, bob = Math.sin(onTwos(t) * 7 + i) * 6;
-    c.save(); c.translate(x, y + bob);
-    c.fillStyle = "#d9d6df"; c.strokeStyle = "#8d88a0"; c.lineWidth = 4;
-    c.beginPath(); c.arc(0, 0, 44, Math.PI, 0); c.lineTo(52, 160); c.lineTo(-52, 160); c.closePath(); c.fill(); c.stroke();
-    c.fillStyle = "#5c5670";
-    c.beginPath(); c.arc(-14, -6, 5, 0, 7); c.arc(14, -6, 5, 0, 7); c.fill();
-    c.beginPath(); c.arc(0, 8, 10, 0, Math.PI); c.stroke();
-    c.restore();
-  }
-}
-
-function drawP2(t) {
-  const c = $("c2").getContext("2d"), f = $("c2f").getContext("2d");
-  const hit = t >= T.hiss;
-  f.clearRect(0, 0, 1920, 1080);
-  if (!hit) {
-    const g = c.createLinearGradient(0, 0, 0, 1080); g.addColorStop(0, "#efeaff"); g.addColorStop(1, "#ffffff");
+function drawBg(t, inSplit, hitHiss) {
+  const c = $("bg").getContext("2d");
+  c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
+  if (!inSplit) {
+    const g = c.createRadialGradient(640, 480, 40, 640, 480, 760);
+    g.addColorStop(0, "rgba(255, 110, 184, 0.24)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
     c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
-    K.halftone(c, 0, 0, 1920, 1080, 30, 8, "rgba(140,120,220,0.18)", (u, v) => clamp(1 - v * 1.4));
   } else {
-    let g = c.createLinearGradient(0, 0, 960, 0); g.addColorStop(0, "#ffd3ea"); g.addColorStop(1, "#ffffff");
-    c.fillStyle = g; c.fillRect(0, 0, 960, 1080);
-    g = c.createLinearGradient(1920, 0, 960, 0); g.addColorStop(0, "#cfe4ff"); g.addColorStop(1, "#ffffff");
-    c.fillStyle = g; c.fillRect(960, 0, 960, 1080);
-    K.focusLines(c, 1920, 1080, 960, 480, 400, 150, t, { color: "#14101f", alpha: 0.9, seed: 3 });
-    const k = Math.floor((t - T.hiss) * 30);
-    if (t - T.hiss > 0.24 || k % 2 === 0) {
-      const seed = 11 + Math.floor((t - T.hiss) * 8);
-      K.drawBolt(f, K.boltPath(1000, -40, 930, 1120, 9, 65, seed), 34, "#ffe14d", "#14101f");
-      K.drawBolt(f, K.boltPath(900, 60, 990, 900, 7, 45, seed + 5), 14, "#7cc4ff", "#14101f");
-    }
-    const pp = (t - T.hiss) / 0.85;
-    K.puff(f, 540, 900, 180, pp, 21); K.puff(f, 1380, 900, 180, pp, 22);
-    const s = 54 * (1 + 0.18 * Math.abs(Math.sin(onTwos(t) * 9)));
-    K.angerMark(f, 800, 290, s, 0.2); K.angerMark(f, 1120, 290, s, -0.2);
+    let g = c.createRadialGradient(450, 520, 30, 450, 520, 720);
+    g.addColorStop(0, hitHiss ? "rgba(255, 96, 176, 0.34)" : "rgba(255, 96, 176, 0.18)");
+    g.addColorStop(1, "rgba(7, 8, 17, 0)"); c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
+    g = c.createRadialGradient(1470, 520, 30, 1470, 520, 720);
+    g.addColorStop(0, hitHiss ? "rgba(86, 172, 255, 0.34)" : "rgba(86, 172, 255, 0.18)");
+    g.addColorStop(1, "rgba(7, 8, 17, 0)"); c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   }
-  K.puff(f, 1380, 620, 260, (t - T.summon) / 0.65, 33);
-}
-
-function drawTitle(t) {
-  const c = $("c3").getContext("2d");
-  const g = c.createRadialGradient(960, 380, 50, 960, 540, 1200);
-  g.addColorStop(0, "#5a3fb0"); g.addColorStop(0.5, "#2a1c66"); g.addColorStop(1, "#0d0826");
-  c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
-  c.save(); c.globalAlpha = 0.12; K.rays(c, 1920, 1080, 960, 380, 24, -t * 0.08, "#ffffff", "rgba(0,0,0,0)"); c.restore();
-  const r = rng(99);
-  for (let i = 0; i < 40; i++) {
-    const x = r() * 1920, y = r() * 1080, sz = 6 + r() * 22, ph = r() * 6.28;
-    const k = 0.4 + 0.6 * Math.abs(Math.sin(onTwos(t) * 3 + ph));
-    K.sparkle(c, x, y, sz * k, 0, i % 3 ? "#ffffff" : "#ffd6f4", null);
+  if (hitHiss) {
+    K.focusLines(c, 1920, 1080, 960, 520, 480, 120, t, { color: "rgba(255,255,255,0.12)", alpha: 1, seed: 5 });
   }
 }
 
 function render(t) {
-  const pa = T.pan;
-  const s = kf(t, [[0, 1.0], [pa, 1.04, ease.inOutSine], [pa + 0.48, 0.47, ease.inOutCubic], [pa + 0.72, 0.47], [pa + 1.2, 1.0, ease.inOutCubic]]);
-  const fy = kf(t, [[0, 540], [pa, 515], [pa + 0.48, 1100, ease.inOutCubic], [pa + 0.72, 1100], [pa + 1.2, 1660, ease.inOutCubic]]);
-  const fx = kf(t, [[0, 960], [pa, 900], [pa + 0.48, 960, ease.inOutCubic]]);
-  let [sx, sy] = shake(t, T.hiss, 0.6, 22);
-  const [sx2, sy2] = shake(t, T.b2, 0.25, 6);
-  sx += sx2; sy += sy2;
-  $("page").style.transform = `translate(${960 - fx * s + sx}px,${540 - fy * s + sy}px) scale(${s})`;
+  const inSplit = t >= T.split;
+  const hitHiss = t >= T.hiss;
+  drawBg(t, inSplit, hitHiss);
 
-  if (t < pa + 0.9) drawP1(t);
-  if (t > pa - 0.1 && t < T.title + 0.3) drawP2(t);
+  const [sx, sy] = shake(t, T.hiss, 0.55, 22);
+  const [sx2, sy2] = shake(t, T.rule1, 0.22, 8);
+  $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
-  UI.put(G.cap1, { s: tw(t, T.cap1, 0.35, ease.outBack), r: -1.5 });
-  const breath = Math.sin(t * 2.6) * 0.008;
-  const laugh = t > T.b1 && t < S.S02.end ? Math.abs(Math.sin(onTwos(t) * 10)) * -10 : 0;
-  UI.put(G.proud, { y: laugh + kf(t, [[0, 40], [0.5, 0, ease.outCubic]]), sy: 1 + breath, sx: 1 - breath * 0.5 });
-  const bt = [T.b1, T.b2, S.S02.end - 0.25, S.S02.end + 0.05];
-  G.bubbles.forEach((b, i) => {
-    const p = tw(t, bt[i], 0.32, ease.outBack);
-    UI.put(b, { s: p, o: clamp(p * 3), r: [-2, 1.5, -1, 4][i] });
-  });
-  G.crowd.forEach((b, i) => {
-    const p = tw(t, S.S01.start + 0.8 + i * 0.35, 0.3, ease.outBack);
-    UI.put(b, { s: p * 0.95, o: clamp(p * 3) });
-  });
+  $("bgT1").style.opacity = inSplit ? 0.25 : 1;
+  $("bgT2").style.opacity = inSplit ? 1 : 0;
 
-  UI.put(G.cap2, { s: tw(t, pa + 1.0, 0.35, ease.outBack), r: -1.5 });
-  const hitP = tw(t, T.hiss, 0.18, ease.outCubic);
-  const lunge = hitP * 50 - tw(t, T.hiss + 0.25, 0.6, ease.inOutSine) * 20;
-  const br2 = Math.sin(t * 3.1) * 0.01;
-  const hissSquash = t > T.hiss && t < T.hiss + 0.5 ? 1 + 0.04 * Math.sin(onTwos(t, 30) * 40) : 1;
-  UI.put(G.L, { x: lunge, sy: (1 + br2) * hissSquash, sx: 1 - br2 * 0.5 });
-  const sumP = tw(t, T.summon + 0.1, 0.25, ease.outBack);
-  UI.put(G.R, { x: -lunge, s: sumP, sy: (1 - br2) * hissSquash, o: clamp(sumP * 4) });
+  const p1Out = tw(t, T.split - 0.12, 0.22);
+  const breath = Math.sin(t * 2.8) * 0.008;
+  const laugh = t < S.S01.end ? Math.abs(Math.sin(onTwos(t) * 9)) * -9 : 0;
+  UI.put(G.proud, { y: laugh, sy: 1 + breath, sx: 1 - breath * 0.5, o: 1 - p1Out });
+
+  const hideB12 = tw(t, T.rule1, 0.2);
+  const pb1 = tw(t, T.b1, 0.3, ease.outBack) * (1 - hideB12);
+  const pb2 = tw(t, T.b2, 0.3, ease.outBack) * (1 - hideB12);
+  const pc1 = tw(t, T.b1 + 0.6, 0.3, ease.outBack) * (1 - hideB12);
+  UI.put(G.bProud1, { s: pb1, o: clamp(pb1 * 3), r: -1.5 });
+  UI.put(G.bProud2, { s: pb2, o: clamp(pb2 * 3), r: 1.2 });
+  UI.put(G.bCrowd1, { s: pc1, o: clamp(pc1 * 3), r: -2 });
+
+  const pr1 = tw(t, T.rule1, 0.28, ease.outBack);
+  UI.put(G.rule1, { y: (1 - pr1) * -40, s: pr1, o: clamp(pr1 * 3) });
+
+  $("slash").style.opacity = tw(t, T.split, 0.25, ease.outCubic);
+
+  const pL = tw(t, T.split, 0.32, ease.outCubic);
+  const pR = tw(t, T.split + 0.08, 0.35, ease.outBack);
+  const lunge = tw(t, T.hiss, 0.18, ease.outCubic) * 48 - tw(t, T.hiss + 0.25, 0.6, ease.inOutSine) * 18;
+  const hissVib = hitHiss && t < T.hiss + 0.5 ? 1 + 0.035 * Math.sin(onTwos(t, 30) * 40) : 1;
+  UI.put(G.L, { x: (1 - pL) * -240 + lunge, sy: hissVib, o: pL });
+  UI.put(G.R, { x: (1 - pR) * 240 - lunge, s: pR, sy: hissVib, o: clamp(pR * 3) });
+
+  const hideWait = tw(t, T.hiss - 0.1, 0.18);
+  const pw = tw(t, T.b3, 0.28, ease.outBack) * (1 - hideWait);
+  const pt = tw(t, T.b4, 0.28, ease.outBack) * (1 - hideWait);
+  UI.put(G.bWait, { s: pw, o: clamp(pw * 3), r: -1.2 });
+  UI.put(G.bTaunt, { s: pt, o: clamp(pt * 3), r: 1.2 });
+
   ["sfxL", "sfxR"].forEach((k, i) => {
-    const p = tw(t, T.hiss + i * 0.06, 0.22, ease.outBack);
-    const jit = t > T.hiss ? (hash(Math.floor(t * 15) + i * 50) - 0.5) * 6 : 0;
-    UI.put(G[k], { s: lerp(2.5, 1, p), o: clamp(p * 2.5), r: (i ? 5 : -6) + jit, x: jit });
+    const p = tw(t, T.hiss + i * 0.05, 0.22, ease.outBack);
+    UI.put(G[k], { s: lerp(2.2, 1, p), o: clamp(p * 3), r: i ? 4 : -4 });
   });
 
-  const ti = $("title");
-  const tOn = t >= T.title + 0.12;
-  ti.style.visibility = tOn ? "visible" : "hidden";
-  if (tOn) {
-    drawTitle(t);
-    G.nameChars.forEach((sp, i) => {
-      const p = tw(t, T.title + 0.2 + i * 0.065, 0.38, ease.outBack);
-      const bob = Math.sin(onTwos(t) * 4 + i * 0.8) * 6 * tw(t, T.title + 1.0, 0.5);
-      UI.put(sp, { y: (1 - p) * -120 + bob, s: p, o: clamp(p * 3) });
-    });
-    const pe = tw(t, T.title + 0.7, 0.4, ease.outCubic);
-    UI.put(G.nameEn, { y: (1 - pe) * 50, o: pe });
-    const pt = tw(t, T.title + 0.9, 0.4, ease.outBack);
-    G.tag.style.transform = `translateX(-50%) scale(${pt})`;
-    G.tag.style.opacity = clamp(pt * 3);
-    const pc = tw(t, T.title + 0.3, 0.55, ease.outCubic);
-    UI.put(G.tL, { x: (1 - pc) * -500, y: Math.sin(onTwos(t) * 5) * 8, r: 6 });
-    UI.put(G.tR, { x: (1 - pc) * 500, y: Math.cos(onTwos(t) * 5) * 8, r: -6 });
-  }
+  const pTitle = tw(t, T.title, 0.32, ease.outBack);
+  UI.put($("title-bar"), { s: pTitle, o: clamp(pTitle * 3) });
 
-  const fl = Math.max(
-    kf(t, [[T.hiss - 0.001, 0], [T.hiss, 0.95, ease.linear], [T.hiss + 0.14, 0, ease.outQuad]]),
-    kf(t, [[T.title - 0.001, 0], [T.title + 0.12, 1, ease.inQuad], [T.title + 0.35, 0, ease.outQuad]]),
-    kf(t, [[T.summon + 0.05, 0], [T.summon + 0.1, 0.5, ease.linear], [T.summon + 0.25, 0, ease.outQuad]])
+  $("flash").style.opacity = Math.max(
+    kf(t, [[T.split - 0.01, 0], [T.split, 0.55], [T.split + 0.14, 0]]),
+    kf(t, [[T.hiss - 0.01, 0], [T.hiss, 0.85], [T.hiss + 0.15, 0]])
   );
-  $("flash").style.opacity = fl;
 }
 
 window.__seek = async (t) => { render(t); };

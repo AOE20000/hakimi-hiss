@@ -1,7 +1,4 @@
-"""生成独立 ASS 中英双语字幕层，并与无声画面 + 混音合成为成片。
-
-用单条 Dialogue + \\N + {\\rEN}：中文在上、英文在下，间距固定，不会被 libass 碰撞重排。
-"""
+"""生成独立 ASS 中英双语字幕层（按说话人区分颜色：A 樱粉白、B 冰蓝白、AB 双猫亮紫）。"""
 import json
 import pathlib
 import subprocess
@@ -18,9 +15,10 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: ZH,Noto Sans SC,52,&H00FFFFFF,&H000000FF,&H001F1014,&H801F1014,-1,0,0,0,100,100,1,0,1,5,2,2,80,80,26,1
-Style: GEM,Noto Sans SC,54,&H00E2B8FF,&H000000FF,&H001F1014,&H801F1014,-1,0,0,0,100,100,1,0,1,5,2,2,80,80,26,1
-Style: EN,Noto Sans SC,30,&H0078E8FF,&H000000FF,&H001F1014,&H801F1014,-1,0,0,0,100,100,0.5,0,1,3.5,1.5,2,80,80,26,1
+Style: A,Noto Sans SC,44,&H00EA9EFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.8,0,1,4.0,1.5,2,80,80,26,1
+Style: B,Noto Sans SC,44,&H00FFD293,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.8,0,1,4.0,1.5,2,80,80,26,1
+Style: AB,Noto Sans SC,50,&H00FFFFFF,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,1.2,0,1,4.5,2.0,2,80,80,26,1
+Style: EN,Noto Sans SC,26,&H00D8C4B8,&H000000FF,&H00120908,&H90120908,-1,0,0,0,100,100,0.5,0,1,3.0,1.0,2,80,80,26,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -38,9 +36,10 @@ def write_ass(ass_path, max_t=None):
     for s in v["segs"]:
         if max_t and s["start"] >= max_t:
             break
-        st = "GEM" if s["who"] in ("gem", "duo") else "ZH"
+        st = s["who"] if s["who"] in ("A", "B", "AB") else "A"
+        tag = "[哈基米A] " if st == "A" else "[哈基米B] " if st == "B" else ""
         t0, t1 = tc(s["start"]), tc(s["end"] + 0.12)
-        lines.append(f"Dialogue: 0,{t0},{t1},{st},,0,0,0,,{{\\fad(80,80)}}{s['zh']}\\N{{\\rEN}}{s['en']}")
+        lines.append(f"Dialogue: 0,{t0},{t1},{st},,0,0,0,,{{\\fad(80,80)}}{tag}{s['zh']}\\N{{\\rEN}}{s['en']}")
     ass_path.write_text("\n".join(lines), encoding="utf-8")
 
 
@@ -57,7 +56,5 @@ def mux(silent_mp4, wav, ass_path, out_mp4):
 
 
 if __name__ == "__main__":
-    ass = ROOT / "out" / "01-hook.ass"
-    write_ass(ass, max_t=15.0)
-    if len(sys.argv) > 1 and sys.argv[1] == "mux":
-        mux(ROOT / "out" / "01-hook.silent.mp4", ROOT / "out" / "01-hook.mix.wav", ass, ROOT / "out" / "01-hook.mp4")
+    ass = ROOT / "out" / "full.ass"
+    write_ass(ass, max_t=None)

@@ -1,134 +1,102 @@
 {
  "fps": 30,
- "total": 58.611,
+ "total": 70.556,
  "segs": [
   {
    "id": "S01",
-   "who": "nar",
-   "zh": "Gemini 过度自信怎么办？",
-   "en": "What do you do when Gemini gets overconfident?",
-   "start": 0.6,
-   "end": 2.295
+   "who": "A",
+   "zh": "我是 Gemini。讲真，我的观察力实在太敏锐了——扫一眼代码，直接把病根切出来！",
+   "en": "I'm Gemini. Honestly, my eye is razor-sharp—one glance and I cut the root cause right out!",
+   "start": 0.55,
+   "end": 6.209
   },
   {
    "id": "S02",
-   "who": "gem",
-   "zh": "我的观察力太敏锐了！直接把病根切出来了！",
-   "en": "My eye is razor-sharp! I cut the root cause right out!",
-   "start": 2.645,
-   "end": 5.595
+   "who": "A",
+   "zh": "等等，这系统通知写的啥……「开启双子哈气对抗审查」？！喂，对面那只怎么跟本喵长得一模一样？！",
+   "en": "Wait, what's this system notice—'Dual-Agent Hiss Review Activated'?! Hey, why does she look just like me?!",
+   "start": 6.709,
+   "end": 13.799
   },
   {
    "id": "S03",
-   "who": "nar",
-   "zh": "简单。再召唤一只 Gemini，让它俩互相哈气。",
-   "en": "Easy. Summon a second Gemini and let them hiss at each other.",
-   "start": 6.045,
-   "end": 9.552
+   "who": "B",
+   "zh": "本喵也收到通知了！上面说抓虫多的拿「一胜」——少废话，这库的虫子全归我！",
+   "en": "I got the notice too! It says most bugs takes 'Round One'—save it, every bug here is mine!",
+   "start": 14.059,
+   "end": 19.348
   },
   {
    "id": "S04",
-   "who": "duo",
+   "who": "AB",
    "zh": "哈——！！",
    "en": "HISSSS!!",
-   "start": 9.802,
-   "end": 10.262
+   "start": 19.568,
+   "end": 20.091
   },
   {
    "id": "S05",
-   "who": "nar",
-   "zh": "这就是，哈基米哈气审查。",
-   "en": "This is Hakimi Hiss Duel.",
-   "start": 10.812,
-   "end": 12.881
+   "who": "A",
+   "zh": "看好了！第四十二行，空指针解引用——本喵先往通道里登上了！",
+   "en": "Watch this! Line forty-two, null pointer dereference—logged in the channel first!",
+   "start": 21.391,
+   "end": 26.152
   },
   {
    "id": "S06",
-   "who": "nar",
-   "zh": "第一局，哈气找 Bug。两只哈基米同时潜入代码库，每抓到一只虫子，就在通道里登记。",
-   "en": "Round one: the bug hunt. Both dive into the codebase and register every bug they catch.",
-   "start": 13.681,
-   "end": 20.455
+   "who": "B",
+   "zh": "我也看到了，第四十四行……咦？！系统弹窗说「相近五行的重复虫子当场拦截」？！",
+   "en": "I saw it too, line forty-four... Huh?! The system notice says 'Near-line duplicate blocked on sight'?!",
+   "start": 26.552,
+   "end": 32.323
   },
   {
    "id": "S07",
-   "who": "gem",
-   "zh": "抓到了！空指针，第四十二行！",
-   "en": "Got one! Null pointer, line forty-two!",
-   "start": 20.755,
-   "end": 22.876
+   "who": "A",
+   "zh": "哈——！慢了一爪！看系统通告没？三比二，这局「一胜」归本喵了！",
+   "en": "Hiss! Too slow by a paw! See the system notice? Three to two—'Round One' goes to me!",
+   "start": 32.643,
+   "end": 36.909
   },
   {
    "id": "S08",
-   "who": "gem",
-   "zh": "哈——！慢了一爪！这只虫子已经被我叼走了！",
-   "en": "Hiss! Too slow by a paw! I already snatched that one!",
-   "start": 23.176,
-   "end": 26.04
+   "who": "B",
+   "zh": "又弹新通知了……「第二局：隔离工作树交叉修复，互修对方的虫子」？！行，套个 try-except 糊弄过去！",
+   "en": "Another notice... 'Round Two: Cross-fix each other's bugs in isolated worktrees'?! Fine, I'll slap a try-except on it!",
+   "start": 38.059,
+   "end": 44.692
   },
   {
    "id": "S09",
-   "who": "nar",
-   "zh": "重复登记，当场拦截。抓得多的，拿下一胜。",
-   "en": "Duplicates are blocked on the spot. Most bugs takes round one.",
-   "start": 26.34,
-   "end": 29.705
+   "who": "A",
+   "zh": "喂！系统刚提示轮到本喵「互哈互验」——你拿个空 except 吞异常也敢交？哈——！点驳回，打回重修！",
+   "en": "Hey! The system just prompted me to 'Hiss-Verify'—you dare submit a bare except?! Hiss! Clicking REJECT!",
+   "start": 45.092,
+   "end": 51.919
   },
   {
    "id": "S10",
-   "who": "nar",
-   "zh": "第二局，交叉修复。你修我的 Bug，我修你的 Bug，各自在独立的工作树里并行开工。",
-   "en": "Round two: cross-fixing. Each fixes the other's bugs, in parallel, in isolated worktrees.",
-   "start": 30.405,
-   "end": 36.5
+   "who": "B",
+   "zh": "呜……终审通知出来了，判你拿「二胜」，居然给本喵贴了个「啥子」标记？！",
+   "en": "Ugh... the final verdict notice is out: you get 'Round Two', and it branded me with a 'DUMMY' tag?!",
+   "start": 52.419,
+   "end": 56.912
   },
   {
    "id": "S11",
-   "who": "gem",
-   "zh": "这也叫修好了？打回重修！",
-   "en": "You call that fixed? Rejected. Do it again!",
-   "start": 36.8,
-   "end": 38.74
+   "who": "A",
+   "zh": "自己看右下角通知——「上下文长期保持，啥子标记随时拉出来复审重修」！还不快改！",
+   "en": "Read the notice in the corner—'Context persists, Dummies can be re-reviewed and re-fixed anytime'! Get to work!",
+   "start": 57.962,
+   "end": 64.506
   },
   {
    "id": "S12",
-   "who": "nar",
-   "zh": "互哈互验之后，由铲屎官亲自裁决。修得更完美的，拿下二胜。",
-   "en": "After mutual hiss-checks, the human makes the final call. The cleaner fix takes round two.",
-   "start": 39.04,
-   "end": 43.956
-  },
-  {
-   "id": "S13",
-   "who": "nar",
-   "zh": "修坏了的？贴上「啥子」。",
-   "en": "Botched it? Branded \"Dummy\".",
-   "start": 44.356,
-   "end": 46.224
-  },
-  {
-   "id": "S14",
-   "who": "nar",
-   "zh": "上下文长期保持，随时复审、重修。",
-   "en": "Context persists, so re-reviews and re-fixes are always on call.",
-   "start": 46.824,
-   "end": 49.836
-  },
-  {
-   "id": "S15",
-   "who": "gem",
-   "zh": "依旧两哈基米相互哈气，就算审查了！",
-   "en": "Two Geminis hissing at each other: that counts as code review!",
-   "start": 50.236,
-   "end": 53.017
-  },
-  {
-   "id": "S16",
-   "who": "nar",
-   "zh": "哈基米哈气审查，Antigravity 插件。",
-   "en": "Hakimi Hiss Duel. A plugin for Antigravity.",
-   "start": 53.517,
-   "end": 56.111
+   "who": "B",
+   "zh": "本喵才不是啥子！等我重修完再跟你哈过！哈——！",
+   "en": "I'm NOT a dummy! Wait till I re-fix this and hiss you again! Hiss!",
+   "start": 64.786,
+   "end": 67.956
   }
  ]
 }

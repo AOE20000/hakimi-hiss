@@ -2,54 +2,45 @@
 <html>
 <head>
 <meta charset="utf-8">
-<title>03-round2 · 第二局：交叉修复 · 互哈互验 · 啥子标记</title>
+<title>03-round2 · 第二局：看见交叉修复通知 → 互哈互验通知 → 终审二胜与啥子通知</title>
 <link rel="stylesheet" href="../../shared/style.css">
 <style>
-  #root { position: absolute; inset: 0; background: #f6f2eb; }
-  /* 阶段 A：交叉修复（左 A 修 B 的 Bug，右 B 修 A 的 Bug，中间 Git Worktree 图） */
+  #root { position: absolute; inset: 0; background: #070811; overflow: hidden; }
   #phaseA, #phaseB { position: absolute; inset: 0; }
-  .wt-box { position: absolute; top: 155px; width: 560px; height: 420px; background: #161229; border: 6px solid #14101f;
-    border-radius: 18px; box-shadow: 10px 10px 0 #14101f; overflow: hidden; font-family: monospace; color: #e6e0ff; z-index: 18; }
-  .wt-box .hdr { height: 52px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
-    font-family: "NotoSC"; font-weight: 900; font-size: 22px; border-bottom: 4px solid #14101f; }
-  .wt-box.A .hdr { background: #ffb5d8; color: #14101f; }
-  .wt-box.B .hdr { background: #a8d8ff; color: #14101f; }
-  .wt-box pre { margin: 0; padding: 16px 20px; font-size: 20px; line-height: 1.55; }
-  .del { color: #ff6b81; background: rgba(255, 80, 100, 0.16); display: block; }
-  .add { color: #5ef29c; background: rgba(80, 240, 140, 0.16); display: block; }
-  .cmd { margin-top: 10px; padding: 8px 12px; background: #0d0a1a; border-radius: 8px; font-size: 18px; }
 
-  /* 中央交叉箭头区 */
-  #cross { position: absolute; left: 620px; top: 165px; width: 680px; height: 400px; z-index: 16; }
+  .wt-box { position: absolute; top: 100px; width: 610px; height: 420px; background: rgba(11, 13, 24, 0.88);
+    backdrop-filter: blur(14px); border: 1px solid rgba(255,255,255,0.14);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.78); overflow: hidden; font-family: "Mono"; z-index: 15; }
+  .wt-box .hdr { height: 42px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between;
+    font-size: 13px; font-weight: 700; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.10); }
+  .wt-box.A .hdr { background: rgba(255, 122, 184, 0.12); color: #ff9ed2; }
+  .wt-box.B .hdr { background: rgba(110, 184, 255, 0.12); color: #93ccff; }
+  .wt-box pre { margin: 0; padding: 16px 20px; font-size: 16.5px; line-height: 1.58; color: #c7d0f0; }
+  .del { color: #ff6b8b; background: rgba(255, 77, 109, 0.14); display: block; }
+  .add { color: #5ef29c; background: rgba(74, 222, 128, 0.13); display: block; }
+  .cmd { margin: 8px 18px 0; padding: 8px 14px; background: rgba(5, 6, 12, 0.85); border: 1px solid rgba(255,255,255,0.08);
+    font-size: 14px; letter-spacing: 1px; }
 
-  /* 驳回印章 */
-  #rej { position: absolute; left: 1180px; top: 320px; width: 540px; padding: 14px 20px; background: #fff0f3;
-    border: 8px solid #d41c3c; border-radius: 16px; box-shadow: 10px 10px 0 #14101f; text-align: center;
-    font-family: "HuangYou"; color: #d41c3c; z-index: 55; transform-origin: 50% 50%; }
-  #rej .big { font-size: 56px; }
-  #rej .sub { font-family: "Bangers"; font-size: 26px; color: #14101f; letter-spacing: 1.5px; }
+  /* 阶段 B：铲屎官终审卡片 */
+  .judge-card { position: absolute; top: 105px; width: 620px; height: 210px; background: rgba(12, 14, 28, 0.90);
+    backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.14); box-shadow: 0 24px 60px rgba(0,0,0,0.8);
+    padding: 20px 26px; box-sizing: border-box; z-index: 20; }
+  .judge-card.A { border-top: 3px solid #4ade80; }
+  .judge-card.B { border-top: 3px solid #ff4d6d; }
+  .judge-card .k { font-family: "Mono"; font-size: 12px; letter-spacing: 2px; color: rgba(255,255,255,0.5); }
+  .judge-card .v { font-family: "SansSC"; font-weight: 800; font-size: 23px; color: #fff; margin-top: 6px; }
+  .judge-card .badge { display: inline-block; margin-top: 14px; padding: 5px 16px; font-family: "Mono";
+    font-weight: 800; font-size: 18px; letter-spacing: 2px; }
+  .judge-card.A .badge { background: rgba(74, 222, 128, 0.15); border: 1px solid #4ade80; color: #86efac; }
+  .judge-card.B .badge { background: rgba(255, 77, 109, 0.16); border: 1px solid #ff4d6d; color: #ff8fa3; }
 
-  /* 阶段 B：铲屎官终审 + 【二胜】 VS 【啥子】 */
-  .judge-card { position: absolute; top: 155px; width: 640px; height: 220px; background: #fff; border: 7px solid #14101f;
-    border-radius: 20px; box-shadow: 10px 10px 0 #14101f; padding: 20px 28px; box-sizing: border-box; font-family: "NotoSC"; z-index: 25; }
-  .judge-card .who { font-weight: 900; font-size: 28px; color: #14101f; }
-  .judge-card .desc { margin-top: 8px; font-size: 23px; color: #4a4166; font-weight: 700; }
-  .verdict { display: inline-block; margin-top: 14px; padding: 6px 20px; border: 5px solid #14101f; border-radius: 12px;
-    font-family: "Bangers"; font-size: 38px; letter-spacing: 2px; }
-  .verdict.ok { background: #52f296; color: #14101f; }
-  .verdict.bad { background: #ff4d5e; color: #fff; }
-
-  /* 巨型【啥子】印章 */
-  #shazi { position: absolute; left: 1160px; top: 430px; width: 540px; padding: 18px 24px; background: rgba(255, 238, 85, 0.97);
-    border: 10px solid #d41c3c; border-radius: 22px; box-shadow: 12px 12px 0 #14101f; text-align: center; z-index: 70; }
-  #shazi .zh { font-family: "HuangYou"; font-size: 120px; line-height: 1; color: #d41c3c; -webkit-text-stroke: 4px #14101f; }
-  #shazi .en { font-family: "Bangers"; font-size: 32px; letter-spacing: 2px; color: #14101f; margin-top: 6px; }
-
-  #win2 { position: absolute; left: 140px; top: 440px; width: 560px; padding: 18px 24px;
-    background: linear-gradient(90deg, #ffe14d, #7ef29d); border: 8px solid #14101f; border-radius: 22px;
-    box-shadow: 12px 12px 0 #14101f; text-align: center; z-index: 70; }
-  #win2 .zh { font-family: "KuaiLe"; font-size: 74px; color: #14101f; }
-  #win2 .en { font-family: "Bangers"; font-size: 30px; letter-spacing: 2px; color: #14101f; }
+  /* 机能风【啥子】全息烙印（贴在 B 头上） */
+  #shazi-tag { position: absolute; left: 1180px; top: 340px; padding: 12px 26px;
+    background: rgba(38, 8, 18, 0.92); border: 2px solid #ff4d6d;
+    box-shadow: 0 0 40px rgba(255, 77, 109, 0.55), 0 18px 40px rgba(0,0,0,0.8);
+    text-align: center; z-index: 90; transform-origin: 50% 50%; }
+  #shazi-tag .zh { font-family: "SerifSC"; font-weight: 900; font-size: 72px; color: #ff6b8b; letter-spacing: 4px; line-height: 1; }
+  #shazi-tag .en { font-family: "Mono"; font-weight: 800; font-size: 13px; letter-spacing: 3px; color: #fda4af; margin-top: 4px; }
 </style>
 <script src="../../shared/kit.js"></script>
 <script src="../../shared/ui.js"></script>
@@ -59,10 +50,12 @@
 <div id="stage">
   <div id="root">
     <canvas class="abs" id="bg" width="1920" height="1080"></canvas>
+    <div class="grid"></div>
+    <div class="bg-type" style="right:40px;top:90px">ROUND_02</div>
 
     <div id="phaseA">
-      <div class="wt-box A" id="wtA" style="left:60px">
-        <div class="hdr"><span>🌿 worktree/fix-A · 修 B 的 Bug</span><span>src/db/pool.py</span></div>
+      <div class="wt-box A" id="wtA" style="left:50px">
+        <div class="hdr"><span>WORKTREE // fix-A (fixes BUG-002 from B)</span><span>src/db/pool.py</span></div>
         <pre>
  def run_tx(sql, args):
      conn = pool.acquire()
@@ -74,67 +67,65 @@
 <span class="add">+        return conn.execute(sql, args)</span>
 <span class="add">+    finally:</span>
 <span class="add">+        conn.close()</span></pre>
-        <div class="cmd" style="color:#5ef29c">$ pytest tests/test_pool.py · 12 passed ✓</div>
+        <div class="cmd" style="color:#86efac">$ pytest tests/test_pool.py // 12 PASSED [0.18s]</div>
       </div>
 
-      <div class="wt-box B" id="wtB" style="left:1300px">
-        <div class="hdr"><span>🌿 worktree/fix-B · 修 A 的 Bug</span><span>src/session.py</span></div>
+      <div class="wt-box B" id="wtB" style="left:1260px">
+        <div class="hdr"><span>WORKTREE // fix-B (fixes BUG-001 from A)</span><span>src/session.py</span></div>
         <pre>
  def load_profile(req):
      tok = req.headers.get("Auth")
      user = get_current_user(tok)
 <span class="del">-    uid = user.id</span>
-<span class="add">+    # 偷懒直接吞掉异常！</span>
 <span class="add">+    try:</span>
 <span class="add">+        uid = user.id</span>
 <span class="add">+    except Exception:</span>
-<span class="add">+        return {}</span></pre>
-        <div class="cmd" style="color:#ff6b81">$ pytest tests/test_auth.py · 2 FAILED ✗</div>
+<span class="add">+        return {}  # swallowed!</span></pre>
+        <div class="cmd" style="color:#ff8fa3">$ pytest tests/test_auth.py // 2 FAILED [auth bypass]</div>
       </div>
-
-      <canvas id="cross" width="680" height="400"></canvas>
-      <div id="rej"><div class="big">打回重修！哈——！</div><div class="sub">REJECT_WITH_HISS · SWALLOWED EXCEPTION</div></div>
     </div>
 
     <div id="phaseB">
-      <div class="judge-card" id="jcA" style="left:160px">
-        <div class="who">哈基米 A · 交叉修复裁决</div>
-        <div class="desc">finally 块确保连接归还 + 参数化查询，单测全绿</div>
-        <div class="verdict ok">⚖️ PERFECT · 完美修复</div>
+      <div class="judge-card A" id="jcA" style="left:90px">
+        <div class="k">HUMAN ARBITRATION // AGENT_A FIX</div>
+        <div class="v">finally 块确保异常分支归还连接 + 参数化查询</div>
+        <div class="badge">VERDICT: PERFECT // 夺得【二胜】</div>
       </div>
-      <div class="judge-card" id="jcB" style="left:1120px">
-        <div class="who">哈基米 B · 交叉修复裁决</div>
-        <div class="desc">用裸 except 吞掉空指针，导致未登录用户拿到空字典越权</div>
-        <div class="verdict bad">⚖️ FAILED · 修复翻车</div>
+      <div class="judge-card B" id="jcB" style="left:1210px">
+        <div class="k">HUMAN ARBITRATION // AGENT_B FIX</div>
+        <div class="v">裸 except 吞掉空指针异常，导致未登录用户越权</div>
+        <div class="badge">VERDICT: FAILED // 贴标【啥子】</div>
       </div>
-      <div id="win2"><div class="zh">🏆 哈基米 A ·【二胜】</div><div class="en">ROUND 2 WINNER · CLEANER FIX</div></div>
-      <div id="shazi"><div class="zh">【啥子】</div><div class="en">TAGGED AS DUMMY · QUEUED FOR RE-FIX</div></div>
+      <div id="shazi-tag"><div class="zh">【啥子】</div><div class="en">TAG: DUMMY // PENDING RE-FIX</div></div>
     </div>
   </div>
+  <div class="vignette"></div>
   <div class="flash" id="flash"></div>
 </div>
 <script>
 const { tw, kf, ease, clamp, lerp, shake, onTwos } = K;
 const $ = (id) => document.getElementById(id);
 const A = "../../assets/chars/cut/";
-const S = {}; ["S10", "S11", "S12", "S13", "S14"].forEach((id) => (S[id] = K.seg(id)));
+const S = {}; ["S08", "S09", "S10", "S11"].forEach((id) => (S[id] = K.seg(id)));
 
-const T0 = +(S.S10.start - 0.1).toFixed(3);
-const T1 = +(S.S14.start - 0.1).toFixed(3);
+const T0 = +(S.S08.start - 0.1).toFixed(3);
+const T1 = +(S.S11.start - 0.1).toFixed(3);
 window.SHOT = { start: T0, end: T1 };
 
 const E = {
-  wt: S.S10.start + 1.2,      // 双 worktree 卡片弹出
-  rej: S.S11.start,           // “这也叫修好了？打回重修！”
-  judge: S.S12.start + 0.3,   // 切换到铲屎官裁决阶段
-  win2: S.S12.end - 0.9,      // 决出【二胜】
-  shazi: S.S13.start + 0.35,  // 盖上【啥子】印章
+  sysCross: T0 + 0.1,         // 系统通知：第二局交叉修复启动（B 看着通知吐槽 S08）
+  wt: S.S08.start + 1.8,      // 左右 Worktree 面板展开
+  sysVer: S.S09.start - 0.2,  // 系统通知：互哈互验开启（A 看着通知念 S09 并点驳回）
+  rejClick: S.S09.start + 4.4,// A 点下 REJECT_WITH_HISS
+  judge: S.S10.start - 0.3,   // 切到阶段 B：系统弹出铲屎官终审通知（B 看着通知哭诉 S10）
+  shazi: S.S10.start + 2.2,   // 【啥子】全息标签啪地贴在 B 旁边
 };
 
 let G = {};
 window.__ready = (async () => {
-  await document.fonts.load('58px "KuaiLe"'); await document.fonts.load('30px "Bangers"');
-  await document.fonts.load('120px "HuangYou"'); await document.fonts.load('900 50px "NotoSC"');
+  await document.fonts.load('900 80px "SerifSC"');
+  await document.fonts.load('900 32px "SansSC"');
+  await document.fonts.load('700 16px "Mono"');
   const im = await K.loadImages({
     typing: A + "pose07.png", cross: A + "pose08.png", smug: A + "pose05.png", dizzy: A + "pose09.png",
   });
@@ -143,106 +134,123 @@ window.__ready = (async () => {
 })();
 
 function build(im) {
-  const pA = $("phaseA"), pB = $("phaseB");
-  G.capA = UI.caption(pA, { x: 40, y: 26, zh: "第二局：双 Worktree 并行交叉修复 & 互哈互验", en: "ROUND 2 · ISOLATED GIT WORKTREES & MUTUAL HISS-CHECK", cls: "blue" });
-  G.aType = UI.char(pA, im.typing, { x: 520, y: 1220, h: 740 });
-  G.aJudge = UI.char(pA, im.cross, { x: 560, y: 1220, h: 740 });
-  G.bType = UI.char(pA, im.typing, { x: 1400, y: 1220, h: 740 });
-  G.bRej = UI.bubble(pA, { x: 650, y: 560, w: 540, h: 190, zh: '这也叫修好了？<br><span class="hl">打回重修！</span>', en: "REJECTED! DO IT AGAIN!", tail: [-60, 120], shape: "spiky" });
+  const root = $("root"), pA = $("phaseA"), pB = $("phaseB");
+  UI.hud(root, { left: "AGENT_A · 橘座 // CROSS-FIX", mid: "PHASE: ROUND2_CROSS_FIX · GIT WORKTREE ISOLATION", right: "AGENT_B · 狸花 // CROSS-FIX" });
 
-  G.capB = UI.caption(pB, { x: 40, y: 26, zh: "铲屎官终审裁决：决出【二胜】· 翻车贴上【啥子】", en: "HUMAN VERDICT · CROWN ROUND 2 & BRAND THE DUMMY" });
-  G.aWin = UI.char(pB, im.smug, { x: 760, y: 1240, h: 820 });
-  G.bDizzy = UI.char(pB, im.dizzy, { x: 1180, y: 1240, h: 820 });
-}
+  // 阶段 A 角色与气泡
+  G.aType = UI.char(pA, im.typing, { x: 460, y: 1220, h: 740, cls: "glow-a" });
+  G.aJudge = UI.char(pA, im.cross, { x: 480, y: 1220, h: 740, cls: "glow-a" });
+  G.bType = UI.char(pA, im.typing, { x: 1460, y: 1220, h: 740, cls: "glow-b" });
 
-function drawCross(t) {
-  const c = $("cross").getContext("2d");
-  c.clearRect(0, 0, 680, 400);
-  const p = tw(t, T0 + 0.5, 0.7, ease.outCubic);
-  if (p <= 0) return;
-  c.save();
-  c.lineWidth = 10; c.lineCap = "round";
-  // A → 修 B 的 Bug；B → 修 A 的 Bug
-  const drawArrow = (x0, y0, x1, y1, col, label, yTxt) => {
-    const xe = lerp(x0, x1, p), ye = lerp(y0, y1, p);
-    c.strokeStyle = "#14101f"; c.lineWidth = 16;
-    c.beginPath(); c.moveTo(x0, y0); c.lineTo(xe, ye); c.stroke();
-    c.strokeStyle = col; c.lineWidth = 10;
-    c.beginPath(); c.moveTo(x0, y0); c.lineTo(xe, ye); c.stroke();
-    if (p > 0.8) {
-      c.font = '900 24px "NotoSC"'; c.fillStyle = "#14101f"; c.textAlign = "center";
-      c.fillRect(210, yTxt - 26, 260, 38);
-      c.fillStyle = col; c.fillText(label, 340, yTxt);
-    }
-  };
-  drawArrow(40, 110, 640, 270, "#ffb5d8", "A 修 B 抓到的 Bug", 80);
-  drawArrow(640, 110, 40, 270, "#78e8ff", "B 修 A 抓到的 Bug", 335);
-  c.restore();
+  G.sysCross = UI.sysNotice(pA, {
+    x: 560, y: 100, w: 800, code: "SYSTEM NOTICE // RULE 03: PARALLEL WORKTREE CROSS-FIX", badge: "ASSIGNED",
+    zh: "【第二局：隔离工作树交叉修复】A 修 B 抓的 Bug · B 修 A 抓的 Bug（自动降级波次乒乓）",
+    en: "hakimi_start_cross_fix(mode='auto') -> isolated git worktrees spawned for A & B",
+  });
+  G.sysVer = UI.sysNotice(pA, {
+    x: 560, y: 330, w: 800, code: "SYSTEM NOTICE // RULE 04: MUTUAL HISS-VERIFY", badge: "REJECT_WITH_HISS", kind: "warn",
+    zh: "【互哈互验通知】原发现者 A 审查 B 的修复：触发 REJECT_WITH_HISS，当场打回重修！",
+    en: "hakimi_report_verify(bug_id='BUG-001', verdict='REJECT_WITH_HISS') -> sent back to B",
+  });
+
+  G.bB8 = UI.polyBubble(pA, {
+    x: 920, y: 545, w: 560, h: 175, who: "GEMINI_B // READING ROUND 2 NOTICE", theme: "b", tailDir: "right",
+    zh: '「隔离工作树交叉修复，互修对方的虫子」？！<br>行，<span class="hl-b">套个 try-except 糊弄过去！</span>',
+    en: "FIX HER BUGS IN WORKTREES?! FINE, SLAP A TRY-EXCEPT ON IT!",
+  });
+  G.bA9 = UI.polyBubble(pA, {
+    x: 440, y: 545, w: 580, h: 180, who: "GEMINI_A // TRIGGERING REJECT_WITH_HISS", theme: "a", tailDir: "left", spiky: true,
+    zh: '系统提示轮到本喵「互哈互验」——<br>空 except 吞异常？<span class="hl-a">点驳回，打回重修！</span>',
+    en: "SYSTEM PROMPTED HISS-VERIFY—BARE EXCEPT?! CLICKING REJECT!",
+  });
+
+  // 阶段 B 角色、系统通知与气泡
+  G.aWin = UI.char(pB, im.smug, { x: 640, y: 1230, h: 820, cls: "glow-a" });
+  G.bDizzy = UI.char(pB, im.dizzy, { x: 1300, y: 1230, h: 820, cls: "glow-b" });
+
+  G.sysJudge = UI.sysNotice(pB, {
+    x: 540, y: 345, w: 840, code: "SYSTEM NOTICE // RULE 05: FINAL VERDICT & 【啥子】 TAG", badge: "【二胜】 / 【啥子】", kind: "gold",
+    zh: "【终审裁决通告】哈基米A 获评 PERFECT 夺得【二胜】· 哈基米B 获评 FAILED 贴上【啥子】标记",
+    en: "hakimi_judge_round2 -> round2_winner: A · BUG-001 tagged 【啥子】 (kept pending for re-fix)",
+  });
+  G.bB10 = UI.polyBubble(pB, {
+    x: 720, y: 555, w: 560, h: 175, who: "GEMINI_B // READING VERDICT NOTICE", theme: "b", tailDir: "right", spiky: true,
+    zh: '终审通知判你拿【二胜】，<br>居然给本喵贴了个<span class="hl-b">「啥子」标记？！</span>',
+    en: "YOU GET ROUND 2 AND IT BRANDED ME WITH A 'DUMMY' TAG?!",
+  });
 }
 
 function render(t) {
   const inB = t >= E.judge;
   const c = $("bg").getContext("2d");
+  c.fillStyle = "#070811"; c.fillRect(0, 0, 1920, 1080);
+
   if (!inB) {
-    K.rays(c, 1920, 1080, 960, 540, 28, -t * 0.04, "#e6eefc", "#f7f3eb");
-    K.halftone(c, 0, 0, 1920, 1080, 28, 8, "rgba(90,110,180,0.16)", (u, v) => clamp(Math.hypot(u - 0.5, v - 0.5) * 1.6 - 0.3));
+    const g = c.createRadialGradient(960, 440, 40, 960, 440, 880);
+    g.addColorStop(0, t >= E.rejClick ? "rgba(255, 64, 104, 0.22)" : "rgba(110, 184, 255, 0.14)");
+    g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   } else {
-    // 左金右灰紫分屏
-    let g = c.createLinearGradient(0, 0, 960, 0); g.addColorStop(0, "#fff0a8"); g.addColorStop(1, "#fffdf4");
-    c.fillStyle = g; c.fillRect(0, 0, 960, 1080);
-    g = c.createLinearGradient(960, 0, 1920, 0); g.addColorStop(0, "#e6e0f0"); g.addColorStop(1, "#bdb4d4");
-    c.fillStyle = g; c.fillRect(960, 0, 960, 1080);
-    if (t >= E.shazi) {
-      K.focusLines(c, 1920, 1080, 1380, 520, 280, 90, t, { color: "#d41c3c", alpha: 0.45, seed: 5 });
-    }
+    let g = c.createRadialGradient(540, 520, 30, 540, 520, 700);
+    g.addColorStop(0, "rgba(74, 222, 128, 0.22)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
+    g = c.createRadialGradient(1380, 520, 30, 1380, 520, 700);
+    g.addColorStop(0, "rgba(255, 77, 109, 0.26)"); g.addColorStop(1, "rgba(7, 8, 17, 0)");
+    c.fillStyle = g; c.fillRect(0, 0, 1920, 1080);
   }
 
-  let [sx, sy] = shake(t, E.rej + 0.15, 0.4, 18);
-  const [sx2, sy2] = shake(t, E.shazi, 0.5, 24);
+  let [sx, sy] = shake(t, E.rejClick, 0.4, 16);
+  const [sx2, sy2] = shake(t, E.shazi, 0.45, 20);
   $("root").style.transform = `translate(${sx + sx2}px,${sy + sy2}px)`;
 
   $("phaseA").style.display = inB ? "none" : "block";
   $("phaseB").style.display = inB ? "block" : "none";
 
   if (!inB) {
-    UI.put(G.capA, { s: tw(t, T0 + 0.1, 0.35, ease.outBack), r: -1 });
-    const wp = tw(t, E.wt, 0.35, ease.outBack);
-    UI.put($("wtA"), { x: (1 - wp) * -300, s: wp, o: clamp(wp * 3) });
-    UI.put($("wtB"), { x: (1 - wp) * 300, s: wp, o: clamp(wp * 3) });
-    drawCross(t);
+    const pSysC = tw(t, E.sysCross, 0.28, ease.outBack);
+    UI.put(G.sysCross, { y: (1 - pSysC) * -30, s: pSysC, o: clamp(pSysC * 3) });
 
-    const rejOn = t >= E.rej;
-    const typo = Math.sin(onTwos(t, 24) * 28) * 5;
+    const wp = tw(t, E.wt, 0.32, ease.outBack);
+    UI.put($("wtA"), { x: (1 - wp) * -260, s: wp, o: clamp(wp * 3) });
+    UI.put($("wtB"), { x: (1 - wp) * 260, s: wp, o: clamp(wp * 3) });
+
+    const rejOn = t >= E.sysVer;
+    const typo = Math.sin(onTwos(t, 24) * 26) * 5;
     UI.put(G.aType, { y: typo, o: rejOn ? 0 : 1 });
-    UI.put(G.aJudge, { sx: -1, s: rejOn ? tw(t, E.rej, 0.25, ease.outBack) : 0, o: rejOn ? 1 : 0 });
+    UI.put(G.aJudge, { sx: -1, s: rejOn ? tw(t, E.sysVer, 0.25, ease.outBack) : 0, o: rejOn ? 1 : 0 });
     UI.put(G.bType, { sx: -1, y: -typo });
 
-    const bp = tw(t, E.rej, 0.25, ease.outBack);
-    UI.put(G.bRej, { s: bp, o: clamp(bp * 3), r: -2 });
-    const rp = tw(t, E.rej + 0.2, 0.22, ease.outBack);
-    UI.put($("rej"), { s: lerp(2.6, 1, rp), r: -9, o: clamp(rp * 4) });
-  } else {
-    UI.put(G.capB, { s: tw(t, E.judge + 0.05, 0.35, ease.outBack), r: -1 });
-    const jp = tw(t, E.judge + 0.2, 0.35, ease.outBack);
-    UI.put($("jcA"), { y: (1 - jp) * -120, s: jp, o: clamp(jp * 3) });
-    UI.put($("jcB"), { y: (1 - jp) * -120, s: jp, o: clamp(jp * 3) });
+    const pB8 = tw(t, S.S08.start + 0.2, 0.26, ease.outBack) * (1 - tw(t, E.sysVer, 0.2));
+    const pA9 = tw(t, S.S09.start + 0.1, 0.26, ease.outBack);
+    UI.put(G.bB8, { s: pB8, o: clamp(pB8 * 3), r: 1 });
+    UI.put(G.bA9, { s: pA9, o: clamp(pA9 * 3), r: -1 });
 
-    const bob = Math.sin(onTwos(t) * 5) * 6;
+    const pVer = tw(t, E.sysVer, 0.26, ease.outBack);
+    UI.put(G.sysVer, { s: pVer, o: clamp(pVer * 3) });
+  } else {
+    const jp = tw(t, E.judge + 0.1, 0.32, ease.outBack);
+    UI.put($("jcA"), { y: (1 - jp) * -80, s: jp, o: clamp(jp * 3) });
+    UI.put($("jcB"), { y: (1 - jp) * -80, s: jp, o: clamp(jp * 3) });
+
+    const pSJ = tw(t, E.judge + 0.15, 0.28, ease.outBack);
+    UI.put(G.sysJudge, { s: pSJ, o: clamp(pSJ * 3) });
+
+    const bob = Math.sin(onTwos(t) * 5) * 5;
     UI.put(G.aWin, { y: bob });
-    const wobble = Math.sin(onTwos(t) * 8) * 5;
+    const wobble = Math.sin(onTwos(t) * 8) * 4;
     UI.put(G.bDizzy, { r: wobble, y: Math.abs(wobble) * 2 });
 
-    const w2 = tw(t, E.win2, 0.3, ease.outBack);
-    UI.put($("win2"), { s: w2, r: -3, o: clamp(w2 * 3) });
+    const pB10 = tw(t, S.S10.start + 0.2, 0.28, ease.outBack);
+    UI.put(G.bB10, { s: pB10, o: clamp(pB10 * 3), r: 1 });
 
-    const sz = tw(t, E.shazi, 0.22, ease.outBack);
-    UI.put($("shazi"), { s: lerp(3.0, 1, sz), r: 10, o: clamp(sz * 4) });
+    const pSz = tw(t, E.shazi, 0.22, ease.outBack);
+    UI.put($("shazi-tag"), { s: lerp(2.4, 1, pSz), r: 8, o: clamp(pSz * 4) });
   }
 
   $("flash").style.opacity = Math.max(
-    kf(t, [[T0, 0.85], [T0 + 0.18, 0]]),
-    kf(t, [[E.judge - 0.02, 0], [E.judge + 0.05, 0.9], [E.judge + 0.22, 0]]),
-    kf(t, [[E.shazi - 0.01, 0], [E.shazi, 0.85], [E.shazi + 0.15, 0]])
+    kf(t, [[T0, 0.7], [T0 + 0.18, 0]]),
+    kf(t, [[E.judge - 0.01, 0], [E.judge + 0.04, 0.75], [E.judge + 0.2, 0]]),
+    kf(t, [[E.shazi - 0.01, 0], [E.shazi, 0.65], [E.shazi + 0.14, 0]])
   );
 }
 
