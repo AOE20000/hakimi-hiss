@@ -2398,7 +2398,7 @@ def cmd_start_cross_fix(
                     "B_worktree": new_worktrees["B"]["path"],
                     "note": (
                         "A 与 B 分别在各自隔离的 Git worktree 中真并行修改，互不踩踏；"
-                        "各自汇报验证结果后，调用 hakimi_integrate_worktrees(action='merge') 合回主仓库并由铲屎官终验裁决。"
+                        "各自汇报验证结果后，可按需由原发现者互哈互验，或直接调用 hakimi_integrate_worktrees(action='merge') 合回主仓库并由铲屎官终验裁决。"
                     ),
                 }
             ]
@@ -2818,7 +2818,7 @@ def cmd_report_fix(
             "bug_status": bug["status"],
             "attempt": attempt,
             "auto_released_files": auto_released,
-            "message": f"{ws['agents'][fx]['name']} 已提交 {bid} 的修复报告（状态：{bug['status']}），等待铲屎官核查并提交二胜裁决！",
+            "message": f"{ws['agents'][fx]['name']} 已提交 {bid} 的修复报告（状态：{bug['status']}），可由铲屎官直接终验裁决，或按需指派原发现者互哈互验！",
         }
 
 

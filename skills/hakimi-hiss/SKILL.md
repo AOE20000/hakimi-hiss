@@ -11,7 +11,7 @@ description: 哈基米哈气审查（Hakimi Hiss Duel）编排技能：使用当
 
 ## 通道访问方式
 
-优先使用插件内置的 MCP 工具（前缀 `hakimi_`：`hakimi_status`、`hakimi_bind_agents`、`hakimi_start_hunt`、`hakimi_report_bug`、`hakimi_list_bugs`、`hakimi_settle_round1`、`hakimi_start_cross_fix`、`hakimi_claim_files`、`hakimi_report_fix`、`hakimi_integrate_worktrees`、`hakimi_judge_round2`、`hakimi_mark_shazi`、`hakimi_reset`）；若当前会话尚未加载该 MCP 工具，等价使用 `run_command` 调用当前环境可用的 Python 3.10+ 解释器（Windows 需避开 `WindowsApps` 占位别名）执行插件目录下的通道脚本：
+优先使用插件内置的 MCP 工具（前缀 `hakimi_`：`hakimi_status`、`hakimi_bind_agents`、`hakimi_start_hunt`、`hakimi_report_bug`、`hakimi_list_bugs`、`hakimi_settle_round1`、`hakimi_start_cross_fix`、`hakimi_claim_files`、`hakimi_report_fix`、`hakimi_report_verify`、`hakimi_integrate_worktrees`、`hakimi_judge_round2`、`hakimi_mark_shazi`、`hakimi_reset`）；若当前会话尚未加载该 MCP 工具，等价使用 `run_command` 调用当前环境可用的 Python 3.10+ 解释器（Windows 需避开 `WindowsApps` 占位别名）执行插件目录下的通道脚本：
 
 ```powershell
 <python3> "<PLUGIN_ROOT>/skills/hakimi-hiss/scripts/hakimi_channel.py" --workspace "<工作区标识>" <子命令> ...
@@ -82,15 +82,18 @@ description: 哈基米哈气审查（Hakimi Hiss Duel）编排技能：使用当
      - 严格按 `waves` 顺序分波次通过 `send_message` 调度（Wave 0 若主文件及关联测试完全隔离可并行；进入每轮 `PING_PONG_TURN` 前等待上一波完成，并提醒双猫编辑重叠/共享文件前先调用 `hakimi_claim_files` 抢占软锁、换边后先 `read_file` 最新文件内容）。
    - 若某一方本轮没有待修任务，只唤醒有任务的一方即可。
    - 叮嘱双猫修完后必须实跑验证命令，并在调用 `hakimi_report_fix` 时附带 `verify_cmd` 与 `verify_passed` 证据（完成同文件最后一项任务时软锁会自动释放）。
-3. **Worktree 合入、铲屎官终验与【二胜】裁决**：
-   - 若本轮启用了 `GIT_WORKTREE_PARALLEL`，在双猫提交修复报告后直接调用 `hakimi_integrate_worktrees(workspace=..., action="merge", cleanup=true)`：
+3. **按需互哈互验（Cross-Verify，可选 · 由主 AI 自主判断触发）**：
+   - 不强制每轮对所有修复全量互验；当主 AI 或铲屎官认为某项修复涉及高危逻辑、复杂边界、自测存疑或更适合原发现者语义复核时，可**主动按需**唤醒原 Bug 发现者调用 `hakimi_report_verify(verifier=..., bug_id=..., verdict="VERIFIED"|"REJECT_WITH_HISS", note=...)` 进行互验（`GIT_WORKTREE_PARALLEL` 下既可让原发现者检查对方 worktree，也可先用 `cleanup=false` 合入后互验再清理）；无需额外互验的修复可直接跳过本步进入第 4 步。
+     - 若原发现者哈气打回（`REJECT_WITH_HISS`），该 Bug 会直接退回 `IN_CROSS_FIX` 状态，通知原修复者返工重修。
+4. **Worktree 合入、铲屎官终验与【二胜】裁决**：
+   - 若本轮启用了 `GIT_WORKTREE_PARALLEL`，在双猫提交修复报告（及按需互验完成后）调用 `hakimi_integrate_worktrees(workspace=..., action="merge", cleanup=true)`：
      - 通道会自动暂存提交双猫 worktree 改动并依次并入主仓库；成功且 `cleanup=true` 时自动清理临时 worktree 与分支；若发生 `MERGE_CONFLICT`（默认 `abort_on_conflict=true`）则原子回滚主仓库并保留双 worktree 供排查。
    - 铲屎官 **必须亲自核查最终主工作区代码并运行验证命令**（不可轻信子代理自夸）。
    - 逐条给出客观评判并调用 `hakimi_judge_round2`：
      - `PERFECT`（+2 分）：修得干净彻底、边界无遗漏、测试通过、未引入新问题。
      - `PASS`（+1 分）：核心问题解决但有小瑕疵。
      - `FAILED`（-1 分）：未修好、漏改、测试失败或引入新 Bug —— **通道会自动给该 Bug 和对应修复者贴上 `【啥子】` 标记！**
-   - 向用户公布 **【二胜】** 得主、双方完美率对比以及被贴上 **`【啥子】`** 标记的翻车榜单。
+   - 向用户公布 **【二胜】** 得主、双方完美率对比、（若有执行）互验概况以及被贴上 **`【啥子】`** 标记的翻车榜单。
 
 ---
 

@@ -160,7 +160,7 @@ TOOLS: list[dict[str, Any]] = [
     ),
     _tool_def(
         "hakimi_report_verify",
-        "互哈互验：仅允许原 Bug 发现者复验对手提交的修复，可放行（VERIFIED）或哈气打回重修（REJECT_WITH_HISS）。",
+        "按需可选（互哈互验）：主 AI 或铲屎官主动判断有必要时指派原 Bug 发现者复验对手提交的修复，可放行（VERIFIED）或哈气打回重修（REJECT_WITH_HISS）；无需额外互验时可直接跳过。",
         {
             "workspace": {"type": "string", "minLength": 1, "description": "可选工作区标识"},
             "verifier": {"type": "string", "enum": ["A", "B"], "description": "复验者：必须是原 Bug 发现者 A 或 B"},
